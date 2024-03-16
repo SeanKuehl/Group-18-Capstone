@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views
 from .views import HomePage
 
 urlpatterns = [
-   
+    path('post/', views.post_index, name="post_index"),
+    path("post/<int:pk>/", views.post_detail, name="post_detail"),
+    path("tag/<tag>/", views.post_tag, name="post_tag"),
     path('', HomePage.as_view(), name='home'),
 ]
