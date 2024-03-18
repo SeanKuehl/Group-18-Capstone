@@ -2,6 +2,10 @@
     <h2>Posts</h2>
 {% endblock page_title %}
 
+<form action="{% url 'search_results'%}" method="get">
+    <input name="q" type="text" placeholder="Search...">
+</form>
+
 {% block page_content %}
     {% block posts %}
         <h3>New Post:</h3><form method="post">

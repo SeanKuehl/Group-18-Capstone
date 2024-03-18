@@ -1,0 +1,9 @@
+<h1>Search Results</h1>
+
+<ul>
+    {% for post in object_list %}
+    <li>
+        {{post.post_title }}, {{post.username}}
+    </li>
+    {% endfor %}
+</ul>

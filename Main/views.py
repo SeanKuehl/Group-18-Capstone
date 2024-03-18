@@ -5,9 +5,22 @@ from Main.forms import CommentForm, PostForm
 
 # Create your views here.
 from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from django.db.models import Q
  
 class HomePage(TemplateView):
     template_name = 'home.html'
+
+class SearchResultsView(ListView):
+    model = Post
+    template_name = 'search_results.html'
+    
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        object_list = Post.objects.filter(
+            Q(post_title__icontains=query) | Q(username__icontains=query)
+        )
+        return object_list
 
 def post_index(request):
     posts = Post.objects.all().order_by("-created_on")
