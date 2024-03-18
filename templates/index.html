@@ -4,6 +4,22 @@
 
 {% block page_content %}
     {% block posts %}
+        <h3>New Post:</h3><form method="post">
+            {% csrf_token %}
+            <div>
+                {{ form.username }}
+            </div>
+            <div>
+                {{ form.post_title }}
+            </div>
+            <div>
+                {{ form.post_community }}
+            </div>
+            <div>
+                {{ form.post_body }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
         {% for post in posts %}
             <h3><a href="{% url 'post_detail' post.pk %}">{{ post.post_title }}</a></h3>
             <small>
