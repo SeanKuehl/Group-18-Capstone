@@ -21,4 +21,6 @@ from .views import HomePage
 urlpatterns = [
    
     path('', HomePage.as_view(), name='home'),
+    path('create-account/', views.create_account, name='create_account'),
+    path('search/', views.search_account, name='search_account'),
 ]

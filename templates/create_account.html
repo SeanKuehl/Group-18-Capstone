@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Account</title>
+</head>
+<body>
+    <h1>Create Account</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required>
+        <label for="account_name">Name:</label>
+        <input type="text" id="account_name" name="account_name" required>
+        <label for="account_bio">Bio:</label>
+        <textarea id="account_bio" name="account_bio"></textarea>
+        <button type="submit">Create Account</button>
+    </form>
+</body>
+</html>
