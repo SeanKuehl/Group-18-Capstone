@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Accounts</title>
+</head>
+<body>
+    <h1>Search Accounts</h1>
+    <form method="get">
+        <input type="text" name="q" placeholder="Search accounts..." value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for user in users %}
+        <li>{{ user.username }}</li>
+        {% empty %}
+        <li>No users found</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
