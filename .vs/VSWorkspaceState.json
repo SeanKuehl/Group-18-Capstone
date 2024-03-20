@@ -4,6 +4,6 @@
     "\\Main",
     "\\templates"
   ],
-  "SelectedNode": "\\templates\\create_account.html",
+  "SelectedNode": "\\Main\\views.py",
   "PreviewInSolutionExplorer": false
 }

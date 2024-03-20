@@ -22,5 +22,5 @@ def create_account(request):
 
 def search_account(request):
     query = request.GET.get('q')
-    accounts = Account.objects.filter(username__icontains=query)
+    accounts = Account.objects.filter(account_name__icontains=query)
     return render(request, 'search_accounts.html', {'users': users, 'query': query})
