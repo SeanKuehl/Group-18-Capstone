@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 
 
@@ -7,15 +6,13 @@ class Account(models.Model):
     #username and email are here to tie object back to user model for later
     
     username = models.CharField(max_length=128)
+    password = models.CharField(max_length=64, default = 'password')
     email = models.CharField(max_length=128)
     account_name = models.CharField(max_length=128)
     account_bio = models.TextField()
 
-
-
-    
-
-
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['password']
 
 class Post(models.Model):
 
