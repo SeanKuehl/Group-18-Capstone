@@ -27,5 +27,4 @@ urlpatterns = [
     path("search/",SearchResultsView.as_view(), name="search_results"),
     path('create-account/', views.create_account, name='create_account'),
     path('search-account/', views.search_account, name='search_account'),
-
 ]

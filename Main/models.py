@@ -11,15 +11,12 @@ class Account(models.Model):
     account_name = models.CharField(max_length=128)
     account_bio = models.TextField()
 
-<<<<<<< HEAD
 class Tag(models.Model):
     name = models.CharField(max_length=30)
     def __str__(self):
         return self.name
-=======
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['password']
->>>>>>> 0d684b9579496fd5c84fe26352ac3b3640d4d39c
 
 class Post(models.Model):
 
