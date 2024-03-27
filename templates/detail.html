@@ -16,6 +16,18 @@
             </a>
         {% endfor %}
     </small>
+    <p>This post has: {{upvotes}} upvotes</p>
+    <p>This post has: {{downvotes}} downvotes</p>
+
+    <a href="{% url 'post_detail' pk=post.id action=1 %}">
+    <button>Up Vote</button>
+    </a>
+
+    <a href="{% url 'post_detail' pk=post.id action=2 %}">
+    <button>Down Vote</button>
+    </a>
+
+
     <p id="PostBody">{{ post.post_body}}</p>
     <button onclick="CopyText()">Copy Text</button>
 
