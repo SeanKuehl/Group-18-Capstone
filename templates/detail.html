@@ -1,17 +1,23 @@
+{% load static %}
+
 {% block page_title %}
-    <h2>{{ post.post_title }}</h2>
+    <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
+
+<script src="{% static 'ClipboardCopyPostScript.js' %}"></script>
+
 {% block page_content %}
-    <small>
+    <small id="DataAndTags">
         {{ post.created_on.date }} | Tags:
         {% for tag in post.tags.all %}
-            <a href=""{% url 'post_tag' tag.name %}>
+            <a href="{% url 'post_tag' tag.name %}">
                 {{ tag.name }}
             </a>
         {% endfor %}
     </small>
-    <p>{{ post.post_body | linebreaks }}</p>
+    <p id="PostBody">{{ post.post_body}}</p>
+    <button onclick="CopyText()">Copy Text</button>
 
     <h3>Leave a comment:</h3><form method="post">
         {% csrf_token %}
