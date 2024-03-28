@@ -68,7 +68,7 @@ def post_detail(request, pk, action):
     #thisUser = User.objects.filter(id = request.user.id)
     #print(thisUser)
 
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         #if not signed in, they can't vote
         pass
     else:
