@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ username }}'s Account</title>
+</head>
+<body>
+    <h1>{{ username }}'s Account</h1>
+
+    <h2>Posts:</h2>
+    <ul>
+        {% for post in user_posts %}
+            <li>
+                <strong>Title:</strong> {{ post.post_title }}<br>
+                <strong>Community:</strong> {{ post.post_community }}<br>
+                <strong>Body:</strong> {{ post.post_body }}<br>
+                <!-- Display other post information as needed -->
+            </li>
+        {% empty %}
+            <li>No posts found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

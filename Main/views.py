@@ -1,5 +1,6 @@
 
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from Main.models import Post, Comment, Account
 from Main.forms import CommentForm, PostForm
@@ -28,17 +29,15 @@ class SearchResultsView(ListView):
 def post_index(request):
     posts = Post.objects.all().order_by("-created_on")
     form = PostForm()
+
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            post = Post(
-                username = form.cleaned_data["username"],
-                post_title = form.cleaned_data["post_title"],
-                post_community = form.cleaned_data["post_community"],
-                post_body = form.cleaned_data["post_body"]
-            )
+            post = form.save(commit=False)
+            post.username = request.user
             post.save()
             return HttpResponseRedirect(request.path_info)
+        
     context = {
         "posts": posts,
         "form": PostForm(),
@@ -78,8 +77,12 @@ def post_detail(request, pk):
 
     return render(request, "detail.html", context)
 
-    
-    
+def user_account(request, username):
+    #retrieve posts created by the user
+    user_posts = Post.objects.filter(username=username)
+
+    #pass user_posts
+    return render(request, 'account_page.html', {'username': username, 'user_posts': user_posts})
     
 def create_account(request):
     if request.method == 'POST':
