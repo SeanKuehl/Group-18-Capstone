@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ username }}'s Account</title>
+    <title>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</title>
 </head>
 <body>
-    <h1>{{ username }}'s Account</h1>
+    <h1>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</h1>
 
     <h2>Posts:</h2>
     <ul>
-        {% for post in user_posts %}
+        {% for post in posts %}
             <li>
                 <strong>Title:</strong> {{ post.post_title }}<br>
                 <strong>Community:</strong> {{ post.post_community }}<br>

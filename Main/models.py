@@ -6,30 +6,29 @@ from django.contrib.auth.models import User
 class Account(models.Model):
     #username and email are here to tie object back to user model for later
     
-    username = models.CharField(max_length=128)
+    username = models.CharField(max_length=128, null=True, unique=True)
     password = models.CharField(max_length=64, default = 'password')
     email = models.CharField(max_length=128)
     account_name = models.CharField(max_length=128)
     account_bio = models.TextField()
 
+    def __str__(self):
+        return self.username
+
 class Tag(models.Model):
     name = models.CharField(max_length=30)
+
     def __str__(self):
         return self.name
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['password']
 
 class Post(models.Model):
-
-    #username and email are here to tie object back to user model for later
-    username = models.ForeignKey(User, on_delete=models.CASCADE)
-    email = models.CharField(max_length=128)
+    accountname = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     post_title = models.CharField(max_length=128)
     post_community = models.CharField(max_length=128)
     post_body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField("Tag", related_name="posts")
+    tags = models.ManyToManyField(Tag, related_name="posts")
 
     def __str__(self):
         return self.post_title

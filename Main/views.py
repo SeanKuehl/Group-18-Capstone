@@ -1,7 +1,6 @@
-
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from Main.models import Post, Comment, Account
 from Main.forms import CommentForm, PostForm
 
@@ -18,32 +17,48 @@ class HomePage(TemplateView):
 class SearchResultsView(ListView):
     model = Post
     template_name = 'search_results.html'
-    
+
     def get_queryset(self):
         query = self.request.GET.get("q")
         object_list = Post.objects.filter(
-            Q(post_title__icontains=query) | Q(username__icontains=query)
+            Q(post_title__icontains=query) | Q(accountname__username__icontains=query)
         )
         return object_list
 
+@login_required
 def post_index(request):
     posts = Post.objects.all().order_by("-created_on")
-    form = PostForm()
-
+    
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
+            current_user = request.user
+            if not current_user.is_superuser:
+                try:
+                    account = Account.objects.get(username=current_user.username)
+                except Account.DoesNotExist:
+                    # Handle the case where the Account instance doesn't exist
+                    # Redirect to a page where the user can create their account
+                    return HttpResponseRedirect('/create-account')
+            else:
+                # If the user is a superuser, set the account to None
+                account = None
+                    
             post = form.save(commit=False)
-            post.username = request.user
+            post.accountname = account
             post.save()
             return HttpResponseRedirect(request.path_info)
-        
+    else:
+        form = PostForm()
+
     context = {
         "posts": posts,
-        "form": PostForm(),
+        "form": form,
     }
 
     return render(request, "index.html", context)
+
+
 
 def post_tag(request, tag):
     posts = Post.objects.filter(
@@ -77,12 +92,21 @@ def post_detail(request, pk):
 
     return render(request, "detail.html", context)
 
-def user_account(request, username):
-    #retrieve posts created by the user
-    user_posts = Post.objects.filter(username=username)
+def user_account(request, user_id):
+    if user_id == 0:
+        # For the placeholder superuser ID, display all posts
+        posts = Post.objects.all()
+        return render(request, 'account_page.html', {'account_name': "Superuser", 'posts': posts})
+    else:
+        # For regular users, retrieve their account and associated posts
+        account = get_object_or_404(Account, pk=user_id)
+        if request.user.is_superuser:
+            return render(request, 'account_page.html', {'account_name': "Superuser's Account", 'posts': posts})
+        else:
+            posts = Post.objects.filter(accountname=account)
+            return render(request, 'account_page.html', {'account': account, 'posts': posts})
 
-    #pass user_posts
-    return render(request, 'account_page.html', {'username': username, 'user_posts': user_posts})
+
     
 def create_account(request):
     if request.method == 'POST':
@@ -92,11 +116,11 @@ def create_account(request):
         account_bio = request.POST.get('account_bio', '')
 
         account = Account.objects.create(username=username, email=email, account_name=account_name, account_bio=account_bio)
-        return redirect('home')
+        #account.save
+    
     return render(request, 'create_account.html')
 
 def search_account(request):
     query = request.GET.get('q')
     accounts = Account.objects.filter(username__icontains=query)
     return render(request, 'search_account.html', {'users': accounts, 'query': query})
-
