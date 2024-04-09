@@ -70,26 +70,26 @@ def post_tag(request, tag):
     }
     return render(request, "tag.html", context)
 
+@login_required
 def post_detail(request, pk):
-    post = Post.objects.get(pk=pk)
-    form = CommentForm()
+    post = get_object_or_404(Post, pk=pk)
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = Comment(
-                author=form.cleaned_data["author"],
-                body=form.cleaned_data["body"],
-                post=post,
-            )
+            comment = form.save(commit=False)
+            comment.author = request.user.username
+            comment.post = post
             comment.save()
             return HttpResponseRedirect(request.path_info)
+    else:
+        form = CommentForm()
+
     comments = Comment.objects.filter(post=post)
     context = {
         "post": post,
         "comments": comments,
-        "form": CommentForm(),
+        "form": form,
     }
-
     return render(request, "detail.html", context)
 
 def user_account(request, user_id):
