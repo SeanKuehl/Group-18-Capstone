@@ -2,6 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from Main.models import Post, Comment, Account
+from django.shortcuts import render, redirect
+from Main.models import Post, Comment, Account, Activity
+
 from Main.forms import CommentForm, PostForm
 
 
@@ -9,6 +12,7 @@ from Main.forms import CommentForm, PostForm
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.db.models import Q
+from django.contrib.auth.models import User
  
 class HomePage(TemplateView):
     template_name = 'home.html'
@@ -70,9 +74,39 @@ def post_tag(request, tag):
     }
     return render(request, "tag.html", context)
 
+#this is how votes/activities work
+#https://simpleisbetterthancomplex.com/tutorial/2016/10/13/how-to-use-generic-relations.html
 @login_required
-def post_detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+def post_detail(request, pk, action):
+    post = Post.objects.get(pk=pk)
+    upvoteAction = 1
+    downvoteAction = 2
+
+    #are they trying to vote twice?
+    #thisUser = User.objects.filter(id = request.user.id)
+    #print(thisUser)
+
+    if request.user.is_anonymous:
+        #if not signed in, they can't vote
+        pass
+    else:
+
+        userAlreadyVoted = post.votes.filter(user=request.user)
+
+
+        if not userAlreadyVoted:
+            if action == upvoteAction:
+                post.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+            elif action == downvoteAction:
+                post.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+            else:
+                pass
+
+        else:
+            #they already voted, don't let them vote again
+            pass
+
+    form = CommentForm()
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -85,10 +119,16 @@ def post_detail(request, pk):
         form = CommentForm()
 
     comments = Comment.objects.filter(post=post)
+
+    postUpvotes = post.votes.filter(activity_type=Activity.UP_VOTE).count()
+    postDownvotes = post.votes.filter(activity_type=Activity.DOWN_VOTE).count()
+
     context = {
         "post": post,
         "comments": comments,
-        "form": form,
+        "form": CommentForm(),
+        "upvotes": postUpvotes,
+        "downvotes": postDownvotes,
     }
     return render(request, "detail.html", context)
 
