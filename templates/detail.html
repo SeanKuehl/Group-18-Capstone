@@ -4,27 +4,22 @@
     <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
-
 <script src="{% static 'ClipboardCopyPostScript.js' %}"></script>
 
 {% block page_content %}
-<<<<<<< HEAD
     <small>
         {{ post.created_on.date }} | 
         {% if post.accountname %}
-            <a href="{% url 'user_account' post.accountname.pk %}">
-                {{ post.accountname.account_name }}
-            </a>
-        {% else %}
-            Superuser
-            <!-- Link to superuser account page -->
-            <a href="{% url 'user_account' 1 %}">Superuser</a>
-        {% endif %}
+                    <a href="{% url 'user_account' post.accountname.pk %}">
+                        {{ post.accountname.account_name }}
+                    </a>
+                {% else %}
+                    <!-- Link to superuser account page -->
+                    <a href="{% url 'user_account' '0' %}">Superuser</a>
+                {% endif %}
         | Tags:
-=======
-    <small id="DataAndTags">
+        <small id="DataAndTags">
         {{ post.created_on.date }} | Tags:
->>>>>>> 8748d7103b6b54ee03f87560a38c8a51618efefc
         {% for tag in post.tags.all %}
             <a href="{% url 'post_tag' tag.name %}">
                 {{ tag.name }}
