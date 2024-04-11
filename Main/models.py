@@ -15,6 +15,7 @@ class Account(models.Model):
     email = models.CharField(max_length=128)
     account_name = models.CharField(max_length=128)
     account_bio = models.TextField()
+    reported_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.username
@@ -58,6 +59,7 @@ class Post(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField("Tag", related_name="posts")
     votes = GenericRelation(Activity)
+    reported_count = models.PositiveIntegerField(default=0)
 
     """
     post_tags = models.CharField(

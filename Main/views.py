@@ -164,3 +164,13 @@ def search_account(request):
     query = request.GET.get('q')
     accounts = Account.objects.filter(username__icontains=query)
     return render(request, 'search_account.html', {'users': accounts, 'query': query})
+
+def report_post(request, post_id):
+    post = Post.objects.get(pk=post_id)
+    post.reported_count += 1
+    post.save()
+
+def report_user(request, user_id):
+    user = Account.objects.get(pk=user_id)
+    user.reported_count += 1
+    user.save()
