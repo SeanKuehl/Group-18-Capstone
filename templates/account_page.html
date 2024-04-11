@@ -19,5 +19,15 @@
             <li>No posts found.</li>
         {% endfor %}
     </ul>
+
+    {% if not user.is_superuser %}
+        <a href="{% url 'report_user' user_id %}">
+            <button>Report User</button>
+        </a>
+        <p>This user has been reported {{ account.reported_count }} times.</p>
+    {% else %}
+        <p>This user is a superuser and cannot be reported.</p>
+    {% endif %}
+    
 </body>
 </html>

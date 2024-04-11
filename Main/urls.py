@@ -28,4 +28,6 @@ urlpatterns = [
     path('create-account/', views.create_account, name='create_account'),
     path('search-account/', views.search_account, name='search_account'),
     path('account_page/<int:user_id>/', views.user_account, name='user_account'),
+    path('report-post/<int:post_id>/', views.report_post, name='report_post'),
+    path('report-user/<int:user_id>/', views.report_user, name='report_user'),
 ]

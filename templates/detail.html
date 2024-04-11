@@ -37,9 +37,13 @@
     <button>Down Vote</button>
     </a>
 
-
     <p id="PostBody">{{ post.post_body}}</p>
     <button onclick="CopyText()">Copy Text</button>
+
+    <a href="{% url 'report_post' post.id %}">
+        <button>Report Post</button>
+    </a>
+    <p>This post has been reported {{ post.reported_count }} times.</p>
 
     <h3>Leave a comment:</h3>
     <form method="post">
