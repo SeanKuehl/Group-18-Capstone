@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
+from django.urls import reverse
 from Main.models import Post, Comment, Account
-from django.shortcuts import render, redirect
 from Main.models import Post, Comment, Account, Activity
 
 from Main.forms import CommentForm, PostForm
@@ -166,9 +166,16 @@ def search_account(request):
     return render(request, 'search_account.html', {'users': accounts, 'query': query})
 
 def report_post(request, post_id):
-    post = Post.objects.get(pk=post_id)
-    post.reported_count += 1
-    post.save()
+    try:
+        post = get_object_or_404(Post, pk=post_id)
+        post.reported_count += 1
+        post.save()
+        # Redirect to the detail page of the reported post
+        return redirect(reverse('post_detail', kwargs={'pk': post_id, 'action': 1}))  # Assuming 'action' is 1 for post detail
+    except Post.DoesNotExist:
+        return JsonResponse({'error': 'The specified post does not exist.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def report_user(request, user_id):
     user = Account.objects.get(pk=user_id)

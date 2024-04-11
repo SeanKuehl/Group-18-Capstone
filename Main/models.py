@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
-
 class Account(models.Model):
     #username and email are here to tie object back to user model for later
     
@@ -60,14 +59,6 @@ class Post(models.Model):
     tags = models.ManyToManyField("Tag", related_name="posts")
     votes = GenericRelation(Activity)
     reported_count = models.PositiveIntegerField(default=0)
-
-    """
-    post_tags = models.CharField(
-        max_length=50,
-        choices=game_choices,
-        default="COD",
-    )
-    """
 
     def __str__(self):
         return self.post_title
