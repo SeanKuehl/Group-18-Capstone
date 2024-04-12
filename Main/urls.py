@@ -16,18 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views
-from .views import HomePage, SearchResultsView
+
+from .views import HomePage, SearchResultsView, SignUp, post_index, post_detail, post_tag
+from .views import create_account, search_account, user_account, report_post, report_user
 
 urlpatterns = [
-    path('post/', views.post_index, name="post_index"),
-    path("post/<int:pk>/<int:action>/", views.post_detail, name="post_detail"),
-    path("tag/<tag>/", views.post_tag, name="post_tag"),
+    path('post/', post_index, name="post_index"),
+    path("post/<int:pk>/<int:action>/", post_detail, name="post_detail"),
+    path("tag/<tag>/", post_tag, name="post_tag"),
     path('', HomePage.as_view(), name='home'),
+    path('signup/', SignUp, name = 'sign_up'),  
     path("search/",SearchResultsView.as_view(), name="search_results"),
-    path('create-account/', views.create_account, name='create_account'),
-    path('search-account/', views.search_account, name='search_account'),
-    path('account_page/<int:user_id>/', views.user_account, name='user_account'),
-    path('report-post/<int:post_id>/', views.report_post, name='report_post'),
-    path('report-user/<int:user_id>/', views.report_user, name='report_user'),
+    path('create-account/', create_account, name='create_account'),
+    path('search-account/', search_account, name='search_account'),
+    path('account_page/<int:user_id>/', user_account, name='user_account'),
+    path('report-post/<int:post_id>/', report_post, name='report_post'),
+    path('report-user/<int:user_id>/', report_user, name='report_user'),
 ]

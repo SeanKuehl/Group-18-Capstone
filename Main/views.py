@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from Main.models import Post, Comment, Account
 from Main.models import Post, Comment, Account, Activity
-
+from django.contrib.auth.forms import UserCreationForm  
+from django.shortcuts import render  
 from Main.forms import CommentForm, PostForm
-
+from django.contrib.auth import login, authenticate
 
 # Create your views here.
 from django.views.generic.base import TemplateView
@@ -22,11 +23,17 @@ class SearchResultsView(ListView):
     model = Post
     template_name = 'search_results.html'
 
+    
+
     def get_queryset(self):
         query = self.request.GET.get("q")
-        object_list = Post.objects.filter(
-            Q(post_title__icontains=query) | Q(accountname__username__icontains=query)
-        )
+        
+
+        if query != None:
+            object_list = []
+        else:
+            object_list = Post.objects.all()
+
         return object_list
 
 @login_required
@@ -36,10 +43,10 @@ def post_index(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            current_user = request.user
-            if not current_user.is_superuser:
+            #current_user = request.user
+            if not request.user.is_superuser:
                 try:
-                    account = Account.objects.get(username=current_user.username)
+                    account = Account.objects.get(user_owner=request.user)
                 except Account.DoesNotExist:
                     # Handle the case where the Account instance doesn't exist
                     # Redirect to a page where the user can create their account
@@ -92,9 +99,11 @@ def post_detail(request, pk, action):
     else:
 
         userAlreadyVoted = post.votes.filter(user=request.user)
+        thisUserAccount = Account.objects.filter(user_owner=request.user)
+        userMadePost = post.objects.filter(accountname=thisUserAccount)
 
 
-        if not userAlreadyVoted:
+        if not userAlreadyVoted and not userMadePost:
             if action == upvoteAction:
                 post.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
             elif action == downvoteAction:
@@ -150,12 +159,13 @@ def user_account(request, user_id):
     
 def create_account(request):
     if request.method == 'POST':
+        user_owner = request.user
         username = request.POST.get('username')
         email = request.POST.get('email')
         account_name = request.POST.get('account_name')
         account_bio = request.POST.get('account_bio', '')
 
-        account = Account.objects.create(username=username, email=email, account_name=account_name, account_bio=account_bio)
+        account = Account.objects.create(user_owner=request.user, username=username, email=email, account_name=account_name, account_bio=account_bio)
         #account.save
     
     return render(request, 'create_account.html')
@@ -181,3 +191,18 @@ def report_user(request, user_id):
     user = Account.objects.get(pk=user_id)
     user.reported_count += 1
     user.save()
+
+
+def SignUp(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})

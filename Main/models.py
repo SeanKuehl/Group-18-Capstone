@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 class Account(models.Model):
     #username and email are here to tie object back to user model for later
+    user_owner = models.ForeignKey(User, on_delete=models.CASCADE)
     
     username = models.CharField(max_length=128, null=True, unique=True)
     password = models.CharField(max_length=64, default = 'password')
