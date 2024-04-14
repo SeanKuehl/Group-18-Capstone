@@ -15,8 +15,17 @@ from django.views.generic.list import ListView
 from django.db.models import Q
 from django.contrib.auth.models import User
  
-class HomePage(TemplateView):
-    template_name = 'home.html'
+
+
+
+def HomePage(request):
+    if not request.user.is_authenticated:
+        context = {}
+
+        return render(request, "home.html", context)
+    elif request.user.is_authenticated:
+        context = {}
+        return render(request, "UserFeed.html", context)
 
 
 class SearchResultsView(ListView):
