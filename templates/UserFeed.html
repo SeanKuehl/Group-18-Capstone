@@ -1,1 +1,73 @@
-<h1> This is the placeholder user feed page! </h1>
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #04AA6D;
+}
+</style>
+</head>
+<body>
+
+<ul>
+  <li><a href="{% url 'no yet implemented' %}">My Account</a></li>
+  <li><a href="{% url 'logout' %}">Log Out</a></li>
+  <li><a href="{% url 'post_index' %}">Create Post</a></li>
+  <li><a href="{% url 'search_account' %}">Search Accounts</a></li>
+</ul>
+
+
+
+{% for post in posts %}
+    <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
+    <small>
+        {{ post.created_on.date }} | 
+        {% if post.accountname %}
+            <a href="{% url 'user_account' post.accountname.pk %}">
+                {{ post.accountname.account_name }}
+            </a>
+        {% else %}
+            <!-- Link to superuser account page -->
+            <a href="{% url 'user_account' '0' %}">Superuser</a>
+        {% endif %}
+        | Tags:
+        {% for tag in post.tags.all %}
+            <a href="{% url 'post_tag' tag.name %}">
+                {{ tag.name }}
+            </a>
+        {% endfor %}
+    </small>
+    <p>{{ post.post_body | slice:":400" }}...</p>
+{% endfor %}
+
+
+
+</body>
+</html>
+
+

@@ -20,11 +20,13 @@ from django.contrib.auth.models import User
 
 def HomePage(request):
     if not request.user.is_authenticated:
+        
         context = {}
 
         return render(request, "home.html", context)
     elif request.user.is_authenticated:
-        context = {}
+        posts = Post.objects.all().order_by("-created_on")
+        context = {"posts": posts}
         return render(request, "UserFeed.html", context)
 
 
@@ -107,9 +109,11 @@ def post_detail(request, pk, action):
         pass
     else:
 
-        userAlreadyVoted = post.votes.filter(user=request.user)
+        userAlreadyVoted = post.votes.filter(user=request.user) #this uses the post instance
         thisUserAccount = Account.objects.filter(user_owner=request.user)
-        userMadePost = post.objects.filter(accountname=thisUserAccount)
+        userMadePost = Post.objects.get(pk=pk)  #this uses the post model, responsible for all instances
+        userMadePost = (userMadePost.accountname == thisUserAccount)
+        
 
 
         if not userAlreadyVoted and not userMadePost:
