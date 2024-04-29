@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</title>
+</head>
+<body>
+    
+    <form method="post">  
+        {% csrf_token %}  
+        {{ form.as_p }}  
+        <input type="submit" value="Save">  
+    </form>  
+
+    
+</body>
+</html>

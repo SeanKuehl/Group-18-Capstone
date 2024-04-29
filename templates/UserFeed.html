@@ -35,7 +35,7 @@ li a:hover:not(.active) {
 <body>
 
 <ul>
-  <li><a href="{% url 'no yet implemented' %}">My Account</a></li>
+  <li><a href="{% url 'my_account' current_user.pk %}">My Account</a></li>
   <li><a href="{% url 'logout' %}">Log Out</a></li>
   <li><a href="{% url 'post_index' %}">Create Post</a></li>
   <li><a href="{% url 'search_account' %}">Search Accounts</a></li>

@@ -11,10 +11,31 @@ from django.contrib.auth import login, authenticate
 
 # Create your views here.
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q
 from django.contrib.auth.models import User
  
+
+
+class MyAccountAndUpdateView(UpdateView): 
+    # specify the model you want to use 
+    model = Account 
+
+    template_name = "MyAccount.html"
+  
+    # specify the fields 
+    fields = [ 
+        "email", 
+        "account_name",
+        "account_bio"
+
+    ] 
+  
+    # can specify success url 
+    # url to redirect after successfully 
+    # updating details 
+    success_url = reverse_lazy('home')
 
 
 
@@ -26,7 +47,7 @@ def HomePage(request):
         return render(request, "home.html", context)
     elif request.user.is_authenticated:
         posts = Post.objects.all().order_by("-created_on")
-        context = {"posts": posts}
+        context = {"posts": posts, "current_user": request.user}
         return render(request, "UserFeed.html", context)
 
 
