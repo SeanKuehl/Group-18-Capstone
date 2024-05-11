@@ -47,7 +47,8 @@ def HomePage(request):
         return render(request, "home.html", context)
     elif request.user.is_authenticated:
         posts = Post.objects.all().order_by("-created_on")
-        context = {"posts": posts, "current_user": request.user}
+        thisUserAccount = Account.objects.get(user_owner=request.user)
+        context = {"posts": posts, "current_user": request.user, "admin": thisUserAccount.admin_status}
         return render(request, "UserFeed.html", context)
 
 
@@ -112,6 +113,21 @@ def post_tag(request, tag):
         "posts": posts,
     }
     return render(request, "tag.html", context)
+
+
+def remove_post(request, pk):
+    post = Post.objects.get(pk=pk)
+    post.delete()
+    context = {}
+    return render(request, "post_removed.html", context)
+
+
+def remove_account(request, pk):
+    account = Account.objects.get(pk=pk)
+    account.delete()
+    context = {}
+    return render(request, "account_removed.html", context)
+
 
 #this is how votes/activities work
 #https://simpleisbetterthancomplex.com/tutorial/2016/10/13/how-to-use-generic-relations.html
@@ -186,8 +202,9 @@ def user_account(request, user_id):
         if request.user.is_superuser:
             return render(request, 'account_page.html', {'account_name': "Superuser's Account", 'posts': posts})
         else:
+            thisUserAccount = Account.objects.get(user_owner=request.user)
             posts = Post.objects.filter(accountname=account)
-            return render(request, 'account_page.html', {'account': account, 'posts': posts})
+            return render(request, 'account_page.html', {'account': account, 'posts': posts, 'current_user': thisUserAccount})
 
 
     

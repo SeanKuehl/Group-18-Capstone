@@ -11,11 +11,12 @@ class Account(models.Model):
     user_owner = models.ForeignKey(User, on_delete=models.CASCADE)
     
     username = models.CharField(max_length=128, null=True, unique=True)
-    password = models.CharField(max_length=64, default = 'password')
+    password = models.CharField(max_length=64, default = 'password')    #we REALLY ought to change this!
     email = models.CharField(max_length=128)
     account_name = models.CharField(max_length=128)
     account_bio = models.TextField()
     reported_count = models.PositiveIntegerField(default=0)
+    admin_status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
