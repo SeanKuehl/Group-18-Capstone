@@ -3,9 +3,13 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<div align="center">
+<h1> Sonar </h1>
+</div>
 {% if user.is_authenticated %}
 
 <p>Hi {{ user.username }}!</p>
+<!-- this should no longer be reached because they should have an account and be taken to the user feed page as their signed in home-->
 <form action="{% url 'logout' %}" method="post">
   {% csrf_token %}
   <button type="submit">Log Out</button>
@@ -24,4 +28,34 @@
 </a>
 
 {% endif %}
+
+<div align="center">
+  <h3> What is Sonar? </h3>
+  <p> We're glad you asked! Sonar is a social media platform for finding people who share your gaming interests
+    so you can lobby up and play! Sonar is much more than just an alternative to built-in lobbying though.
+    Sonar allows you to find and lobby up with players who are looking to play at a certain competition level,
+    do the same quest or even just play with the same settings and rules. With our platform you can always find
+    the right players to game with regardless of time or region barriers!
+  </p>
+
+  <h3> I know a forum that does something like this </h3>
+  <p> You might be right. There are many community forums out there that are sometimes used for lobbying.
+    Our platform aims to be a one-stop-shop for players from all communities, skill levels and interests.
+    On Sonar you can find players looking for everything from Magic the Gathering in-person meetups to
+    competitve COD leagues.
+  </p>
+
+  <h3> Why Sonar? </h3>
+  <p> We think you should use Sonar if you are looking for awesome games with awesome people. With our platform
+    you can find and play with exactly the kinds of players that you're looking for. No long waits for trolls involved.
+    Sonar also hosts many leagues and communities that offer their own experiences on top of simple lobbying for matches.
+    Maybe you could check some of those our while you're here, too.
+  </p>
+
+
+
+</div>
+
+
+
 {% endblock %}
