@@ -47,9 +47,21 @@ def HomePage(request):
         return render(request, "home.html", context)
     elif request.user.is_authenticated:
         posts = Post.objects.all().order_by("-created_on")
-        thisUserAccount = Account.objects.get(user_owner=request.user)
-        context = {"posts": posts, "current_user": request.user, "admin": thisUserAccount.admin_status}
-        return render(request, "UserFeed.html", context)
+        thisUserAccount = Account.objects.filter(user_owner=request.user)
+
+        if not thisUserAccount.exists():
+            #they aren't signed in yet, direct them to the login screen
+            return HttpResponseRedirect('/accounts/login/?')
+        else:
+            thisUserAccount = Account.objects.get(user_owner=request.user)
+            context = {"posts": posts, "current_user": request.user, "admin": thisUserAccount.admin_status}
+            return render(request, "UserFeed.html", context)
+       
+            
+            
+        
+
+        
 
 
 class SearchResultsView(ListView):
@@ -209,6 +221,10 @@ def user_account(request, user_id):
 
     
 def create_account(request):
+
+    
+    
+
     if request.method == 'POST':
         user_owner = request.user
         username = request.POST.get('username')
