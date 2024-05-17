@@ -1,49 +1,10 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333;
-}
+{% block title %} {% endblock %}
 
-li {
-  float: left;
-}
-
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-li a:hover:not(.active) {
-  background-color: #111;
-}
-
-.active {
-  background-color: #04AA6D;
-}
-</style>
-</head>
-<body>
-
-<ul>
-  <li><a href="{% url 'my_account' current_user.pk %}">My Account</a></li>
-  <li><a href="{% url 'logout' %}">Log Out</a></li>
-  <li><a href="{% url 'post_index' %}">Create Post</a></li>
-  <li><a href="{% url 'search_account' %}">Search Accounts</a></li>
-</ul>
-
-
-
+{% block content %}
 {% for post in posts %}
+  <div style="text-align: left;">
     <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
     <small>
         {{ post.created_on.date }} | 
@@ -63,11 +24,6 @@ li a:hover:not(.active) {
         {% endfor %}
     </small>
     <p>{{ post.post_body | slice:":400" }}...</p>
+  </div>
 {% endfor %}
-
-
-
-</body>
-</html>
-
-
+{% endblock %}
