@@ -11,7 +11,7 @@
         {{ post.created_on.date }} | 
         {% if post.accountname %}
                     <a href="{% url 'user_account' post.accountname.pk %}">
-                        {{ post.accountname.account_name }}
+                        {{ post.accountname.username }}
                     </a>
                 {% else %}
                     <!-- Link to superuser account page -->

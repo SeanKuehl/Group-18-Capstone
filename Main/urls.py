@@ -18,7 +18,7 @@ Including another URLconf
 from django.urls import path
 
 from .views import HomePage, SearchResultsView, SignUp, post_index, post_detail, post_tag
-from .views import create_account, search_account, user_account, report_post, report_user, MyAccountAndUpdateView
+from .views import search_account, user_account, report_post, report_user, MyAccountAndUpdateView
 
 urlpatterns = [
     path('post/', post_index, name="post_index"),
@@ -27,7 +27,6 @@ urlpatterns = [
     path('', HomePage, name='home'),
     path('signup/', SignUp, name = 'sign_up'),  
     path("search/",SearchResultsView.as_view(), name="search_results"),
-    path('create-account/', create_account, name='create_account'),
     path('search-account/', search_account, name='search_account'),
     path('account_page/<int:user_id>/', user_account, name='user_account'),
     path('my_account/<int:pk>', MyAccountAndUpdateView.as_view(), name='my_account'),

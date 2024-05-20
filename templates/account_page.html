@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</title>
+    <title>{{ account.username }}'s Account</title>
 </head>
 <body>
-    <h1>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</h1>
+    <h1>{{ account.username }}'s Account</h1>
 
     <h2>Posts:</h2>
     <ul>
@@ -21,7 +21,7 @@
     </ul>
 
     {% if not user.is_superuser %}
-        <a href="{% url 'report_user' user_id %}">
+        <a href="{% url 'report_user' account.pk %}">
             <button>Report User</button>
         </a>
         <p>This user has been reported {{ account.reported_count }} times.</p>
