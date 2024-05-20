@@ -63,6 +63,16 @@ li a:hover:not(.active) {
         {% endfor %}
     </small>
     <p>{{ post.post_body | slice:":400" }}...</p>
+
+
+    {% if admin %}
+      <p>This post has been reported: {{post.reported_count}} times</p>
+      <a href="{% url 'remove_post' post.pk %}">
+        <button>Remove Post</button>
+      </a>
+    {% endif %}
+
+
 {% endfor %}
 
 

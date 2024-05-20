@@ -14,10 +14,11 @@ class CustomUserAdmin(UserAdmin):
         "username",
         "account_bio",
         "reported_count",
+        "admin_status",
         "is_staff",
     ]
-    fieldsets = UserAdmin.fieldsets + ((None, {"fields": ("account_bio", "reported_count")}),)
-    add_fieldsets = UserAdmin.add_fieldsets = ((None, {"fields": ("account_bio", "reported_count")}),)
+    fieldsets = UserAdmin.fieldsets + ((None, {"fields": ("account_bio", "reported_count", "admin_status")}),)
+    add_fieldsets = UserAdmin.add_fieldsets = ((None, {"fields": ("account_bio", "reported_count", "admin_status")}),)
 
 
 
