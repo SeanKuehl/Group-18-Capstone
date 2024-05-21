@@ -18,7 +18,7 @@ Including another URLconf
 from django.urls import path
 
 from .views import HomePage, SearchResultsView, SignUp, post_index, post_detail, post_tag
-from .views import create_account, search_account, user_account, report_post, report_user, MyAccountAndUpdateView
+from .views import create_account, search_account, user_account, report_post, report_user, get_existing_tags, MyAccountAndUpdateView
 
 urlpatterns = [
     path('post/', post_index, name="post_index"),
@@ -33,4 +33,5 @@ urlpatterns = [
     path('my_account/<int:pk>', MyAccountAndUpdateView.as_view(), name='my_account'),
     path('report-post/<int:post_id>/', report_post, name='report_post'),
     path('report-user/<int:user_id>/', report_user, name='report_user'),
+    path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
 ]
