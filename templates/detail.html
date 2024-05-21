@@ -4,41 +4,43 @@
     <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
-<script src="{% static 'ClipboardCopyPostScript.js' %}"></script>
-
 {% block page_content %}
     <small>
         {{ post.created_on.date }} | 
         {% if post.accountname %}
-                    <a href="{% url 'user_account' post.accountname.pk %}">
-                        {{ post.accountname.account_name }}
-                    </a>
-                {% else %}
-                    <!-- Link to superuser account page -->
-                    <a href="{% url 'user_account' '0' %}">Superuser</a>
-                {% endif %}
+            <a href="{% url 'user_account' post.accountname.pk %}">
+                {{ post.accountname.account_name }}
+            </a>
+        {% else %}
+            <!-- Link to superuser account page -->
+            <a href="{% url 'user_account' '0' %}">Superuser</a>
+        {% endif %}
         | Tags:
         <small id="DataAndTags">
-        {{ post.created_on.date }} | Tags:
-        {% for tag in post.tags.all %}
-            <a href="{% url 'post_tag' tag.name %}">
-                {{ tag.name }}
-            </a>
-        {% endfor %}
+            {{ post.created_on.date }} | Tags:
+            {% for tag in post.tags.all %}
+                <a href="{% url 'post_tag' tag.name %}">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </small>
     </small>
     <p>This post has: {{upvotes}} upvotes</p>
     <p>This post has: {{downvotes}} downvotes</p>
 
     <a href="{% url 'post_detail' pk=post.id action=1 %}">
-    <button>Up Vote</button>
+        <button>Up Vote</button>
     </a>
 
     <a href="{% url 'post_detail' pk=post.id action=2 %}">
-    <button>Down Vote</button>
+        <button>Down Vote</button>
     </a>
 
     <p id="PostBody">{{ post.post_body}}</p>
     <button onclick="CopyText()">Copy Text</button>
+
+    <!-- Button to copy post URL -->
+    <button id="copyLinkBtn">Copy Post Link</button>
 
     <a href="{% url 'report_post' post.id %}">
         <button>Report Post</button>
@@ -67,3 +69,31 @@
         </p>
     {% endfor %}
 {% endblock page_content %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var copyLinkBtn = document.getElementById('copyLinkBtn');
+        
+        copyLinkBtn.addEventListener('click', function() {
+            var postUrl = window.location.href; // Replace this with the actual URL of the post
+            
+            // Create a temporary input element
+            var tempInput = document.createElement('input');
+            tempInput.value = postUrl;
+            document.body.appendChild(tempInput);
+
+            // Select the URL text
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+            // Copy the URL to the clipboard
+            document.execCommand('copy');
+
+            // Remove the temporary input
+            document.body.removeChild(tempInput);
+
+            // Provide feedback to the user (optional)
+            alert('Link copied to clipboard: ' + postUrl);
+        });
+    });
+</script>
