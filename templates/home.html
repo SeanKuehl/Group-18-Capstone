@@ -15,13 +15,13 @@
 
 <p>You are not logged in</p>
 <form action="{% url 'login' %}" method="get">
-  <button type="submit" class="btn btn-primary">Log In</button>
+  <button type="submit" class="btn btn-dark">Log In</button>
 </form>
 
 <p> Don't have an account?</p>
-<a href="{% url 'sign_up' %}">
-<button> Sign Up</button>
-</a>
+<form action="{% url 'sign_up' %}" method="get">
+  <button type="submit" class="btn btn-secondary">Sign Up</button>
+</form>
 
 {% endif %}
 {% endblock %}

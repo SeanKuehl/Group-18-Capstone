@@ -1,4 +1,8 @@
+{% extends "base.html" %}
+
 {% load static %}
+
+{% block content %}
 
 {% block page_title %}
     <h2 id="PostTitle">{{ post.post_title }}</h2>
@@ -70,6 +74,9 @@
     {% endfor %}
 {% endblock page_content %}
 
+{% endblock %}
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -97,3 +104,4 @@
         });
     });
 </script>
+
