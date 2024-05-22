@@ -2,23 +2,11 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.auth.models import User
+from Accounts.models import CustomUser
 
 # Create your models here.
 
-class Account(models.Model):
-    #username and email are here to tie object back to user model for later
-    user_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    username = models.CharField(max_length=128, null=True, unique=True)
-    password = models.CharField(max_length=64, default = 'password')
-    email = models.CharField(max_length=128)
-    account_name = models.CharField(max_length=128)
-    account_bio = models.TextField()
-    reported_count = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
-        return self.username
 
 class Tag(models.Model):
     name = models.CharField(max_length=30)
@@ -40,7 +28,7 @@ class Activity(models.Model):
         (DOWN_VOTE, 'Down Vote'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -51,7 +39,8 @@ class Activity(models.Model):
 
 
 class Post(models.Model):
-    accountname = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
+    #accountname changes to account which is now the user object
+    accountname = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     post_title = models.CharField(max_length=128)
     post_community = models.CharField(max_length=128)
     post_body = models.TextField()

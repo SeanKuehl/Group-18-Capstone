@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from Main.models import Post, Comment, Account
-from Main.models import Post, Comment, Account, Activity
-from django.contrib.auth.forms import UserCreationForm  
+from Main.models import Post, Comment, Activity
+from Main.forms import CustomUserCreationForm  
 from django.shortcuts import render  
 from Main.forms import CommentForm, PostForm
+from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
 
 # Create your views here.
@@ -14,21 +14,21 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q
-from django.contrib.auth.models import User
+
  
 
 
 class MyAccountAndUpdateView(UpdateView): 
     # specify the model you want to use 
-    model = Account 
+    model = CustomUser
 
     template_name = "MyAccount.html"
   
     # specify the fields 
     fields = [ 
         "email", 
-        "account_name",
-        "account_bio"
+        "username",
+        "account_bio",
 
     ] 
   
@@ -47,7 +47,7 @@ def HomePage(request):
         return render(request, "home.html", context)
     elif request.user.is_authenticated:
         posts = Post.objects.all().order_by("-created_on")
-        context = {"posts": posts, "current_user": request.user}
+        context = {"posts": posts, "current_user": request.user, "admin": request.user.admin_status}
         return render(request, "UserFeed.html", context)
 
 
@@ -78,7 +78,7 @@ def post_index(request):
             #current_user = request.user
             if not request.user.is_superuser:
                 try:
-                    account = Account.objects.get(user_owner=request.user)
+                    account = request.user
                 except Account.DoesNotExist:
                     # Handle the case where the Account instance doesn't exist
                     # Redirect to a page where the user can create their account
@@ -122,6 +122,21 @@ def post_index(request):
 
 
 
+def remove_post(request, pk):
+    post = Post.objects.get(pk=pk)
+    post.delete()
+    context = {}
+    return render(request, "post_removed.html", context)
+
+
+def remove_account(request, pk):
+    account = Account.objects.get(pk=pk)
+    account.delete()
+    context = {}
+    return render(request, "account_removed.html", context)
+
+
+
 def post_tag(request, tag):
     posts = Post.objects.filter(
         tags__name__contains=tag
@@ -150,9 +165,9 @@ def post_detail(request, pk, action):
     else:
 
         userAlreadyVoted = post.votes.filter(user=request.user) #this uses the post instance
-        thisUserAccount = Account.objects.filter(user_owner=request.user)
-        userMadePost = Post.objects.get(pk=pk)  #this uses the post model, responsible for all instances
-        userMadePost = (userMadePost.accountname == thisUserAccount)
+        thisUserAccount = request.user
+        userMadePost = Post.objects.get(accountname=request.user)  #this uses the post model, responsible for all instances
+        userMadePost = (userMadePost.accountname == thisUserAccount.username)
         
 
 
@@ -198,34 +213,28 @@ def user_account(request, user_id):
     if user_id == 0:
         # For the placeholder superuser ID, display all posts
         posts = Post.objects.all()
-        return render(request, 'account_page.html', {'account_name': "Superuser", 'posts': posts})
+        return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
     else:
         # For regular users, retrieve their account and associated posts
-        account = get_object_or_404(Account, pk=user_id)
+        account = CustomUser.objects.get(pk=user_id)
         if request.user.is_superuser:
-            return render(request, 'account_page.html', {'account_name': "Superuser's Account", 'posts': posts})
+            return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
         else:
             posts = Post.objects.filter(accountname=account)
             return render(request, 'account_page.html', {'account': account, 'posts': posts})
 
 
     
-def create_account(request):
-    if request.method == 'POST':
-        user_owner = request.user
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        account_name = request.POST.get('account_name')
-        account_bio = request.POST.get('account_bio', '')
 
-        account = Account.objects.create(user_owner=request.user, username=username, email=email, account_name=account_name, account_bio=account_bio)
-        #account.save
-    
-    return render(request, 'create_account.html')
 
 def search_account(request):
     query = request.GET.get('q')
-    accounts = Account.objects.filter(username__icontains=query)
+
+    if query == None:
+        accounts = []
+    else:
+        accounts = CustomUser.objects.filter(username__icontains=query)
+
     return render(request, 'search_account.html', {'users': accounts, 'query': query})
 
 def report_post(request, post_id):
@@ -241,14 +250,27 @@ def report_post(request, post_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 def report_user(request, user_id):
-    user = Account.objects.get(pk=user_id)
-    user.reported_count += 1
-    user.save()
+
+    try:
+        
+        user = get_object_or_404(CustomUser, pk=user_id)
+        user.reported_count += 1
+        user.save()
+        # Redirect to the detail page of the reported post
+        return redirect(reverse_lazy('home'))  
+    except Post.DoesNotExist:
+        return JsonResponse({'error': 'The specified post does not exist.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+    
+    
 
 
 def SignUp(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -257,10 +279,11 @@ def SignUp(request):
             login(request, user)
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
 def get_existing_tags(request):
     # Get all existing tags from the posts
     existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
     return JsonResponse(existing_tags, safe=False)
+        
