@@ -24,6 +24,12 @@
             <div>
                 {{ form.post_body }}
             </div>
+            <!-- Add the tags input field with id="tagInput" -->
+            <div>
+                <label for="tagInput">Tags:</label>
+                <input type="text" name="tags" id="tagInput" placeholder="Tags" autocomplete="off">
+            </div>
+            <!-- Add a submit button -->
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         {% for post in posts %}
@@ -50,4 +56,39 @@
     {% endblock posts %}
 {% endblock page_content %}
 
+
 {% endblock %}
+
+<!-- Add the JavaScript code at the end of the file -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tagInput = document.getElementById('tagInput');
+        var tagForm = document.getElementById('tagForm');
+
+        tagInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                // Prevent default behavior of Enter key
+                event.preventDefault();
+
+                // Get the current caret position
+                var caretPosition = tagInput.selectionStart;
+                
+                // Insert a comma at the caret position
+                var value = tagInput.value;
+                tagInput.value = value.slice(0, caretPosition) + ',' + value.slice(caretPosition);
+
+                // Move the caret to the position after the comma
+                tagInput.selectionStart = tagInput.selectionEnd = caretPosition + 1;
+            }
+        });
+
+        tagForm.addEventListener('submit', function(event) {
+            // Prevent form submission
+            event.preventDefault();
+            // Add your form submission handling code here if needed
+        });
+    });
+</script>
+
+
+

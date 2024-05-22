@@ -90,13 +90,32 @@ def post_index(request):
             post = form.save(commit=False)
             post.accountname = account
             post.save()
+
+            # Process tags separately
+            tags_input = request.POST.get('tags')
+            if tags_input:
+                # Split the tags input string into individual tags
+                tags_list = tags_input.split(',')
+                for tag_name in tags_list:
+                    # Remove leading and trailing spaces from each tag
+                    tag_name = tag_name.strip()
+                    tag, created = post.tags.get_or_create(name=tag_name)
+                    # Add the tag to the post
+                    post.tags.add(tag)
+
             return HttpResponseRedirect(request.path_info)
     else:
         form = PostForm()
 
+     # Get existing tags from all posts
+    existing_tags = []
+    for post in posts:
+        existing_tags.extend(post.tags.values_list('name', flat=True))
+
     context = {
         "posts": posts,
         "form": form,
+        "existing_tags": existing_tags,
     }
 
     return render(request, "index.html", context)
@@ -240,3 +259,8 @@ def SignUp(request):
     else:
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
+
+def get_existing_tags(request):
+    # Get all existing tags from the posts
+    existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
+    return JsonResponse(existing_tags, safe=False)

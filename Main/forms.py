@@ -10,9 +10,11 @@ class CommentForm(forms.ModelForm):
         }
 
 class PostForm(forms.ModelForm):
+    tags = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Tags"}))
+
     class Meta:
         model = Post
-        fields = ['post_title', 'post_community', 'post_body']
+        fields = ['post_title', 'post_community', 'post_body', 'tags']
         widgets = {
             'post_title': forms.TextInput(attrs={"class": "form-control", "placeholder": "Title"}),
             'post_community': forms.TextInput(attrs={"class": "form-control", "placeholder": "Community"}),
