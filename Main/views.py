@@ -77,12 +77,9 @@ def post_index(request):
         if form.is_valid():
             #current_user = request.user
             if not request.user.is_superuser:
-                try:
-                    account = request.user
-                except Account.DoesNotExist:
-                    # Handle the case where the Account instance doesn't exist
-                    # Redirect to a page where the user can create their account
-                    return HttpResponseRedirect('/create-account')
+                
+                account = request.user
+                
             else:
                 # If the user is a superuser, set the account to None
                 account = None
@@ -166,7 +163,7 @@ def post_detail(request, pk, action):
 
         userAlreadyVoted = post.votes.filter(user=request.user) #this uses the post instance
         thisUserAccount = request.user
-        userMadePost = Post.objects.get(accountname=request.user)  #this uses the post model, responsible for all instances
+        userMadePost = Post.objects.get(accountname=request.user, pk=pk)  #this uses the post model, responsible for all instances
         userMadePost = (userMadePost.accountname == thisUserAccount.username)
         
 

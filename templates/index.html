@@ -13,36 +13,37 @@
 {% block page_content %}
     {% block posts %}
         <h3>New Post:</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div>
-                {{ form.post_title }}
-            </div>
-            <div>
-                {{ form.post_community }}
-            </div>
-            <div>
-                {{ form.post_body }}
-            </div>
-            <!-- Add the tags input field with id="tagInput" -->
-            <div>
-                <label for="tagInput">Tags:</label>
-                <input type="text" name="tags" id="tagInput" placeholder="Tags" autocomplete="off">
-            </div>
-            <!-- Add a submit button -->
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        <div id="tagForm">
+            <form method="post">
+                {% csrf_token %}
+                <div>
+                    {{ form.post_title }}
+                </div>
+                <div>
+                    {{ form.post_community }}
+                </div>
+                <div>
+                    {{ form.post_body }}
+                </div>
+                <!-- Add the tags input field with id="tagInput" -->
+                <div>
+                    <label for="tagInput">Tags:</label>
+                    <input type="text" name="tags" id="tagInput" placeholder="Tags" autocomplete="off">
+                </div>
+                <!-- Add a submit button -->
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
         {% for post in posts %}
             <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
             <small>
                 {{ post.created_on.date }} | 
                 {% if post.accountname %}
                     <a href="{% url 'user_account' post.accountname.pk %}">
-                        {{ post.accountname.account_name }}
+                        {{ post.accountname.username }}
                     </a>
                 {% else %}
-                    <!-- Link to superuser account page -->
-                    <a href="{% url 'user_account' '0' %}">Superuser</a>
+                    <p> test </p>
                 {% endif %}
                 | Tags:
                 {% for tag in post.tags.all %}
@@ -57,13 +58,13 @@
 {% endblock page_content %}
 
 
-{% endblock %}
 
-<!-- Add the JavaScript code at the end of the file -->
+
 <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         var tagInput = document.getElementById('tagInput');
-        var tagForm = document.getElementById('tagForm');
+        var postForm = document.getElementById('postForm');
 
         tagInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
@@ -82,7 +83,7 @@
             }
         });
 
-        tagForm.addEventListener('submit', function(event) {
+        postForm.addEventListener('submit', function(event) {
             // Prevent form submission
             event.preventDefault();
             // Add your form submission handling code here if needed
@@ -90,5 +91,4 @@
     });
 </script>
 
-
-
+{% endblock %}
