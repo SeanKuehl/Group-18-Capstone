@@ -65,3 +65,16 @@ class Comment(models.Model):
 
 
 
+
+class UserReview(models.Model):
+    author = models.CharField(max_length=60)
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    user_reviewed = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.author} on '{self.user_reviewed.username}'"
+    
+
+
+

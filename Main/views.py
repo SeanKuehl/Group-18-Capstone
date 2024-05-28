@@ -2,10 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from Main.models import Post, Comment, Activity
+from Main.models import Post, Comment, Activity, UserReview
 from Main.forms import CustomUserCreationForm  
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm
+from Main.forms import CommentForm, PostForm, UserReviewForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
 
@@ -217,8 +217,24 @@ def user_account(request, user_id):
         if request.user.is_superuser:
             return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
         else:
+            #this is where most regular users will go 
             posts = Post.objects.filter(accountname=account)
-            return render(request, 'account_page.html', {'account': account, 'posts': posts})
+
+            form = UserReviewForm()
+            if request.method == "POST":
+                form = UserReviewForm(request.POST)
+                if form.is_valid():
+                    review = form.save(commit=False)
+                    review.author = request.user.username
+                    review.user_reviewed = request.user
+                    review.save()
+                    return HttpResponseRedirect(request.path_info)
+            else:
+                form = UserReviewForm()
+
+            reviews_on_this_user = UserReview.objects.filter(user_reviewed=account)
+
+            return render(request, 'account_page.html', {'account': account, 'posts': posts, 'form': form, 'reviews': reviews_on_this_user})
 
 
     
