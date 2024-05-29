@@ -35,4 +35,5 @@ urlpatterns = [
     path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
     path('remove-post/<int:pk>/', remove_post, name='remove_post'),
     path('remove-account/<int:pk>/', remove_account, name='remove_accout'),
+    path('register-business/',  register_business_number, name='register_business'),
 ]

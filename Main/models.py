@@ -78,3 +78,12 @@ class UserReview(models.Model):
 
 
 
+class RegisteredBusiness(models.Model):
+    business_number = models.IntegerField()
+    associated_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    
+    
+
+
+
