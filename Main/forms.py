@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment, UserReview
+from .models import Post, Comment, UserReview, DiscountOffer
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
 
@@ -25,6 +25,15 @@ class CommentForm(forms.ModelForm):
         fields = ['body']
         widgets = {
             'body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Leave a comment!"})
+        }
+
+
+class DiscountOfferForm(forms.ModelForm):
+    class Meta:
+        model = DiscountOffer
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Creat a discount!"})
         }
 
 class UserReviewForm(forms.ModelForm):

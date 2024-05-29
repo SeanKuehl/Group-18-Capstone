@@ -5,10 +5,10 @@ from django.conf import settings
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from Main.models import Post, Comment, Activity, UserReview, RegisteredBusiness
-from Main.forms import CustomUserCreationForm  
+from Main.models import Post, Comment, Activity, UserReview, RegisteredBusiness, DiscountOffer
+from Main.forms import CustomUserCreationForm, DiscountOfferForm
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm, UserReviewForm
+from Main.forms import CommentForm, PostForm, UserReviewForm, DiscountOfferForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
 
@@ -375,4 +375,40 @@ def register_business_number(request):
             }
     
         return render(request, "register_business.html", context)
+    
+
+
+
+def view_discounts_page(request):
+    user_is_business = False
+    this_business = RegisteredBusiness.objects.get(associated_user=request.user)
+    offers = DiscountOffer.objects.all()
+
+    if this_business:
+        user_is_business = True
+
+    form = DiscountOfferForm()
+    if request.method == "POST":
+        form = DiscountOfferForm(request.POST)
+        if form.is_valid():
+            discount = form.save(commit=False)
+            discount.author = request.user.username
+            discount.associated_business = this_business
+            discount.save()
+
+            context = {
+                "is_business": user_is_business,
+                "form": form,
+                "offers": offers,
+            }
+
+            return render(request, "view_discounts.html", context)
+        
+    context = {
+                "is_business": user_is_business,
+                "form": form,
+                "offers": offers,
+            }
+
+    return render(request, "view_discounts.html", context)
         

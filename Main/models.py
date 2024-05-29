@@ -82,6 +82,17 @@ class RegisteredBusiness(models.Model):
     business_number = models.IntegerField()
     associated_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
+
+
+
+class DiscountOffer(models.Model):
+    author = models.CharField(max_length=60)
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    associated_business = models.ForeignKey(RegisteredBusiness, on_delete=models.CASCADE)
+
+    
+
     
     
 
