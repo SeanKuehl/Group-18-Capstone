@@ -8,6 +8,9 @@ from django.shortcuts import render
 from Main.forms import CommentForm, PostForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
+from notifications.models import Notification
+
+import logging
 
 # Create your views here.
 from django.views.generic.base import TemplateView
@@ -188,6 +191,13 @@ def post_detail(request, pk, action):
             comment.author = request.user.username
             comment.post = post
             comment.save()
+
+            # Create notification
+            Notification.objects.create(
+                user=post.accountname,
+                text=f'{comment.author} commented on your post: "{post.post_title}"'
+            )
+
             return HttpResponseRedirect(request.path_info)
     else:
         form = CommentForm()
@@ -283,4 +293,3 @@ def get_existing_tags(request):
     # Get all existing tags from the posts
     existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
     return JsonResponse(existing_tags, safe=False)
-        

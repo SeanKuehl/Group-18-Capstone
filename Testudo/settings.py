@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Main',
     'Accounts',
     'bootstrap5',
+    'notifications',
 ]
 
 MIDDLEWARE = [
