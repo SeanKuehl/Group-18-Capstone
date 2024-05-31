@@ -7,7 +7,7 @@ from Main.forms import CustomUserCreationForm
 from django.shortcuts import render  
 from Main.forms import CommentForm, PostForm
 from Accounts.models import CustomUser
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, get_user_model
 from notifications.models import Notification
 
 import logging
@@ -103,6 +103,21 @@ def post_index(request):
                     # Add the tag to the post
                     post.tags.add(tag)
 
+            # Extract usernames mentioned in the post content
+            mentioned_usernames = [word[1:] for word in post.post_body.split() if word.startswith('@')]
+            
+            # Notify mentioned users
+            User = get_user_model()  # Get the custom user model
+            for username in mentioned_usernames:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    Notification.objects.create(
+                        user=mentioned_user,
+                        text=f'You were mentioned in a post by {request.user.username}'
+                    )
+                except User.DoesNotExist:
+                    pass
+
             return HttpResponseRedirect(request.path_info)
     else:
         form = PostForm()
@@ -191,6 +206,23 @@ def post_detail(request, pk, action):
             comment.author = request.user.username
             comment.post = post
             comment.save()
+
+            # Code for notif if you mention someone
+
+            # Extract usernames mentioned in the comment
+            mentioned_usernames = [word[1:] for word in comment.body.split() if word.startswith('@')]
+            
+            # Notify mentioned users
+            User = get_user_model()  # Get the custom user model
+            for username in mentioned_usernames:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    Notification.objects.create(
+                        user=mentioned_user,
+                        text=f'You were mentioned in a comment by {request.user.username} on post "{post.post_title}"'
+                    )
+                except User.DoesNotExist:
+                    pass
 
             # Create notification
             Notification.objects.create(
