@@ -8,6 +8,7 @@ from django.shortcuts import render
 from Main.forms import CommentForm, PostForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate, get_user_model
+from django.utils.safestring import mark_safe
 from notifications.models import Notification
 
 import logging
@@ -111,9 +112,15 @@ def post_index(request):
             for username in mentioned_usernames:
                 try:
                     mentioned_user = User.objects.get(username=username)
+                    post_url = reverse('post_detail', kwargs={'pk': post.pk, 'action': 0})
+                    notification_text = f'You were mentioned in a post "{post.post_title}" by {request.user.username}.'
+                    notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
+                    #lets the hyperlink show up
+                    notification_text = mark_safe(notification_text)
+
                     Notification.objects.create(
                         user=mentioned_user,
-                        text=f'You were mentioned in a post by {request.user.username}'
+                        text=notification_text
                     )
                 except User.DoesNotExist:
                     pass
@@ -217,9 +224,14 @@ def post_detail(request, pk, action):
             for username in mentioned_usernames:
                 try:
                     mentioned_user = User.objects.get(username=username)
+                    post_url = reverse('post_detail', kwargs={'pk': comment.post.pk, 'action': 0})
+                    notification_text = f'You were mentioned in a comment by {request.user.username}: "{comment.body}".'
+                    notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
+                    notification_text = mark_safe(notification_text)
+
                     Notification.objects.create(
                         user=mentioned_user,
-                        text=f'You were mentioned in a comment by {request.user.username} on post "{post.post_title}"'
+                        text=notification_text
                     )
                 except User.DoesNotExist:
                     pass
