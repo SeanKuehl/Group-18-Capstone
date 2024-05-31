@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path
-
+from . import views
 
 from .views import *
 
@@ -35,4 +35,7 @@ urlpatterns = [
     path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
     path('remove-post/<int:pk>/', remove_post, name='remove_post'),
     path('remove-account/<int:pk>/', remove_account, name='remove_accout'),
+    path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
+    path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
 ]

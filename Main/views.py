@@ -293,3 +293,17 @@ def get_existing_tags(request):
     # Get all existing tags from the posts
     existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
     return JsonResponse(existing_tags, safe=False)
+
+def notifications_list(request):
+    notifications = Notification.objects.all()
+    return render(request, 'notifications_list.html', {'notifications': notifications})
+
+def clear_all_notifications(request):
+    if request.method == 'POST':
+        Notification.objects.all().delete()
+    return redirect('notifications_list')
+
+def clear_notification(request, notification_id):
+    if request.method == 'POST':
+        Notification.objects.filter(id=notification_id).delete()
+    return redirect('notifications_list')
