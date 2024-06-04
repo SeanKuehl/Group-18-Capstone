@@ -41,4 +41,5 @@ urlpatterns = [
     path('leagues/<int:league_id>/join/', join_league, name='join_league'),
     path('leagues/<int:league_id>/leave/', leave_league, name='leave_league'),
     path('leagues/<int:league_id>/delete/', delete_league, name='delete_league'),
+    path('leagues/<int:league_id>/update/', update_league, name='update_league'),
 ]

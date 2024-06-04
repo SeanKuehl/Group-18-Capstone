@@ -326,4 +326,28 @@ def league_list(request):
 def league_detail(request, league_id):
     league = get_object_or_404(League, id=league_id)
     members = league.members.all()
-    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members})
+
+    if request.method == 'POST':
+        if request.user == league.owner:
+            form = LeagueForm(request.POST, instance=league)
+            if form.is_valid():
+                form.save()
+                return redirect('league_detail', league_id=league.id)
+    else:
+        form = LeagueForm(instance=league)
+
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'form': form})
+
+@login_required
+def update_league(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if request.user != league.owner:
+        return redirect('league_detail', league_id=league.id)
+
+    if request.method == 'POST':
+        form = LeagueForm(request.POST, instance=league)
+        if form.is_valid():
+            form.save()
+            return redirect('league_detail', league_id=league.id)
+
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': league.members.all(), 'form': form})
