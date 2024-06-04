@@ -2,21 +2,19 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from Main.models import Post, Comment, Activity
+from Main.models import Post, Comment, Activity, League, LeagueMembership
 from Main.forms import CustomUserCreationForm  
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm
+from Main.forms import CommentForm, PostForm, LeagueForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q
-
- 
-
 
 class MyAccountAndUpdateView(UpdateView): 
     # specify the model you want to use 
@@ -284,3 +282,49 @@ def get_existing_tags(request):
     existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
     return JsonResponse(existing_tags, safe=False)
         
+
+@login_required
+def create_league(request):
+    if request.method == 'POST':
+        form = LeagueForm(request.POST)
+        if form.is_valid():
+            league = form.save(commit=False)
+            league.owner = request.user
+            league.save()
+            LeagueMembership.objects.create(player=request.user, league=league)
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = LeagueForm()
+    return render(request, 'leagues/create_league.html', {'form': form})
+
+@login_required
+def join_league(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if not LeagueMembership.objects.filter(player=request.user, league=league).exists():
+        LeagueMembership.objects.create(player=request.user, league=league)
+    return redirect('league_detail', league_id=league.id)
+
+@login_required
+def leave_league(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    membership = LeagueMembership.objects.filter(player=request.user, league=league).first()
+    if membership:
+        membership.delete()
+    return redirect('league_list')
+
+@login_required
+def delete_league(request, league_id):
+    league = get_object_or_404(League, id=league_id, owner=request.user)
+    league.delete()
+    return redirect('league_list')
+
+@login_required
+def league_list(request):
+    leagues = League.objects.all()
+    return render(request, 'leagues/league_list.html', {'leagues': leagues})
+
+@login_required
+def league_detail(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    members = league.members.all()
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members})
