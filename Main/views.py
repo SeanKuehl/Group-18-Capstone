@@ -188,18 +188,29 @@ def post_detail(request, pk, action):
 
         userAlreadyVoted = post.votes.filter(user=request.user) #this uses the post instance
         thisUserAccount = request.user
-        userMadePost = Post.objects.get(accountname=request.user, pk=pk)  #this uses the post model, responsible for all instances
-        userMadePost = (userMadePost.accountname == thisUserAccount.username)
         
+        postAuthor = post.accountname
+        currentUser = request.user.username
 
-
+        userMadePost = (postAuthor == currentUser)
+        
         if not userAlreadyVoted and not userMadePost:
             if action == upvoteAction:
                 post.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+                notification_text = f'{request.user.username} upvoted your post: "{post.post_title}".'
             elif action == downvoteAction:
                 post.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+                notification_text = f'{request.user.username} downvoted your post: "{post.post_title}".'
             else:
                 pass
+
+            # Save the notification
+
+            if action in [upvoteAction, downvoteAction]:
+                Notification.objects.create(
+                    user = post.accountname,
+                    text = notification_text
+                )
 
         else:
             #they already voted, don't let them vote again
