@@ -43,3 +43,7 @@ class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
         fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
+        }

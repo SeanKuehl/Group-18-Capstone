@@ -4,10 +4,14 @@
 
 {% block content %}
   <h2>Leagues</h2>
-  <ul>
+  <ul class="list-group">
     {% for league in leagues %}
-      <li><a href="{% url 'league_detail' league.id %}">{{ league.name }}</a></li>
+    <ul class="list-group">
+      <li class="list-group-item"><a style="text-decoration: none" href="{% url 'league_detail' league.id %}">{{ league.name }}</a></li>
     {% endfor %}
   </ul>
-  <a href="{% url 'create_league' %}">Create a new league</a>
+  <form action="{% url 'create_league' %}" method="post" class="mt-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Create a new league</button>
+  </form>
 {% endblock %}
