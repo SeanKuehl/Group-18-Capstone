@@ -62,6 +62,21 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.author} on '{self.post}'"
     
+# Gaming leagues 
+class League(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    owner = models.ForeignKey(CustomUser, related_name='owned_leagues', on_delete=models.CASCADE)
+    members = models.ManyToManyField(CustomUser, related_name='leagues', through='LeagueMembership')
 
+    def __str__(self):
+        return self.name
 
+class LeagueMembership(models.Model):
+    player = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
 
+    # Ensures that a player can join a league only once
+    class Meta:
+        unique_together = ('player', 'league')
