@@ -35,4 +35,10 @@ urlpatterns = [
     path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
     path('remove-post/<int:pk>/', remove_post, name='remove_post'),
     path('remove-account/<int:pk>/', remove_account, name='remove_accout'),
+    path('leagues/', league_list, name='league_list'),
+    path('leagues/<int:league_id>/', league_detail, name='league_detail'),
+    path('leagues/create/', create_league, name='create_league'),
+    path('leagues/<int:league_id>/join/', join_league, name='join_league'),
+    path('leagues/<int:league_id>/leave/', leave_league, name='leave_league'),
+    path('leagues/<int:league_id>/delete/', delete_league, name='delete_league'),
 ]

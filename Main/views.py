@@ -8,7 +8,6 @@ from django.shortcuts import render
 from Main.forms import CommentForm, PostForm, LeagueForm
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 from django.views.generic.base import TemplateView
