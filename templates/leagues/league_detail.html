@@ -27,7 +27,7 @@
           </div>
           <div class="text-center">
             <button type="submit" id="save-button" class="btn btn-primary d-none">Save</button>
-            <button type="button" id="cancel-button" class="btn btn-danger" onclick="window.history.back()">Cancel</button>
+            <a href="{% url 'league_detail' league.id %}" class="btn btn-danger">Cancel</a>
           </div>
         </form>
       </div>
