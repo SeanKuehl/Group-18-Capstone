@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>{{ league.name }}</h2>
+    <p>{{ league.description }}</p>
+    <p><strong>Owner:</strong> {{ league.owner.username }}</p>
+
+    <h4>Members</h4>
+    <ul>
+      {% for member in members %}
+        <li>{{ member.username }}</li>
+      {% empty %}
+        <li>No members yet.</li>
+      {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated %}
+      {% if user in members %}
+        <form action="{% url 'leave_league' league.id %}" method="post" class="mt-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Leave League</button>
+        </form>
+      {% else %}
+        <form action="{% url 'join_league' league.id %}" method="post" class="mt-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Join League</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <p>You need to <a href="{% url 'login' %}">login</a> to join or leave leagues.</p>
+    {% endif %}
+
+    {% if user == league.owner %}
+      <form action="{% url 'delete_league' league.id %}" method="post" class="mt-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete League</button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}
