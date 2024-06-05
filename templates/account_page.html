@@ -16,6 +16,7 @@
         </a>
     {% endif %}
 
+
     <h2>Posts:</h2>
     <ul>
         {% for post in posts %}
@@ -29,6 +30,32 @@
             <li>No posts found.</li>
         {% endfor %}
     </ul>
+
+    <h3>Leave a review:</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {{ form.author }}
+        </div>
+        <div>
+            {{ form.body }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+    <h3>Reviews:</h3>
+    {% for rev in reviews %}
+        <p>
+            On {{ rev.created_on.date }} <b>{{ rev.author }}</b> wrote:
+        </p>
+        <p>
+            {{ rev.body | linebreaks }}
+        </p>
+    {% endfor %}
+
+
+    
 
     {% if not user.is_superuser %}
         <a href="{% url 'report_user' account.pk %}">

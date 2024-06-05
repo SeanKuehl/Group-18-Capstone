@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discount Offers</title>
+</head>
+<body>
+    <h1>Current Special Offers</h1>
+
+    <a href="{% url 'home' %}">
+    <button>Home</button>
+    </a>
+    {% if is_business %}
+
+    <h3>Create an offer:</h3>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div>
+            {{ form.body }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    {% endif %}
+
+    <h3>Current Offers:</h3>
+    {% for offer in offers %}
+        <p>
+            On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
+        </p>
+        <p>
+            {{ offer.body | linebreaks }}
+        </p>
+    {% endfor %}
+
+
+
+    
+
+    
+    
+</body>
+</html>
+{% endblock %}
