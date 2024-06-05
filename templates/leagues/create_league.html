@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Create League{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Create League</h2>
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label for="{{ form.name.id_for_label }}" class="form-label">League Name</label>
+        {{ form.name }}
+        {% for error in form.name.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      
+      <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+        {{ form.description }}
+        {% for error in form.description.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+  </div>
+{% endblock %}

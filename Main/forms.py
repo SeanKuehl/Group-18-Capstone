@@ -1,5 +1,7 @@
 from django import forms
-from .models import Post, Comment, UserReview, DiscountOffer
+
+from .models import Post, Comment, League, UserReview, DiscountOffer
+
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
 
@@ -55,4 +57,14 @@ class PostForm(forms.ModelForm):
             'post_title': forms.TextInput(attrs={"class": "form-control", "placeholder": "Title"}),
             'post_community': forms.TextInput(attrs={"class": "form-control", "placeholder": "Community"}),
             'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Post body here..."}),
+        }
+
+# The LeagueForm is for creating and updating League instances.
+class LeagueForm(forms.ModelForm):
+    class Meta:
+        model = League
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
         }
