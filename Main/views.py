@@ -1,11 +1,16 @@
+import requests
+
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from Main.models import Post, Comment, Activity, League, LeagueMembership
-from Main.forms import CustomUserCreationForm  
+
+from Main.models import Post, Comment, Activity, League, LeagueMembership, UserReview, RegisteredBusiness, DiscountOffer
+from Main.forms import CustomUserCreationForm, DiscountOfferForm
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm, LeagueForm
+from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
+
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate
 
@@ -214,8 +219,24 @@ def user_account(request, user_id):
         if request.user.is_superuser:
             return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
         else:
+            #this is where most regular users will go 
             posts = Post.objects.filter(accountname=account)
-            return render(request, 'account_page.html', {'account': account, 'posts': posts})
+
+            form = UserReviewForm()
+            if request.method == "POST":
+                form = UserReviewForm(request.POST)
+                if form.is_valid():
+                    review = form.save(commit=False)
+                    review.author = request.user.username
+                    review.user_reviewed = request.user
+                    review.save()
+                    return HttpResponseRedirect(request.path_info)
+            else:
+                form = UserReviewForm()
+
+            reviews_on_this_user = UserReview.objects.filter(user_reviewed=account)
+
+            return render(request, 'account_page.html', {'account': account, 'posts': posts, 'form': form, 'reviews': reviews_on_this_user})
 
 
     
@@ -280,6 +301,115 @@ def get_existing_tags(request):
     # Get all existing tags from the posts
     existing_tags = list(Post.objects.values_list('tags__name', flat=True).distinct())
     return JsonResponse(existing_tags, safe=False)
+
+
+
+def validate_business_number(business_num):
+    #using the Government of Canada's ISED Corporations API
+
+
+    #https://apigateway-passerelledapi.ised-isde.canada.ca/corporations/api/v1/corporations/106679285.json?lang=eng
+    #note: API key SHOULD NOT be in plain text
+    language = 'eng'
+    url = 'https://apigateway-passerelledapi.ised-isde.canada.ca/corporations/api/v1/corporations/'+business_num+'.json?lang='+language+''
+
+    response = requests.get(url, headers={"accept": "application/json", "user-key": settings.API_KEY})
+    returned_json = response.json() 
+
+    #check for invalid response code first
+
+    if response.status_code == 200:
+
+        if type(returned_json[0]) == dict:
+            #it is a valid business
+            return True
+        else:
+            #it is not a valid business
+            return False
+        
+    else:
+        return False
+
+
+
+def register_business_number(request):
+    error = False
+
+    if request.method == 'POST':
+        business_number = request.POST['business_number']
+
+        if validate_business_number(str(business_number)) == True:
+            #create it registered to this user
+            existing_business = RegisteredBusiness.objects.filter(associated_user=request.user, business_number=int(business_number))
+
+            if not existing_business:
+                new_business = RegisteredBusiness.objects.create(associated_user=request.user, business_number=int(business_number))
+                new_business.save()
+                #it worked, redirect to home
+                return redirect('home')
+            
+            else:
+                error = True
+
+                context = {
+                    "error": error,
+                }
+        
+                return render(request, "register_business.html", context)
+
+        else:
+            #set error and return to the same screen
+            error = True
+
+            context = {
+                "error": error,
+            }
+    
+            return render(request, "register_business.html", context)
+        
+
+    else:
+        context = {
+                "error": error,
+            }
+    
+        return render(request, "register_business.html", context)
+    
+
+
+
+def view_discounts_page(request):
+    user_is_business = False
+    this_business = RegisteredBusiness.objects.get(associated_user=request.user)
+    offers = DiscountOffer.objects.all()
+
+    if this_business:
+        user_is_business = True
+
+    form = DiscountOfferForm()
+    if request.method == "POST":
+        form = DiscountOfferForm(request.POST)
+        if form.is_valid():
+            discount = form.save(commit=False)
+            discount.author = request.user.username
+            discount.associated_business = this_business
+            discount.save()
+
+            context = {
+                "is_business": user_is_business,
+                "form": form,
+                "offers": offers,
+            }
+
+            return render(request, "view_discounts.html", context)
+        
+    context = {
+                "is_business": user_is_business,
+                "form": form,
+                "offers": offers,
+            }
+
+    return render(request, "view_discounts.html", context)
         
 
 @login_required

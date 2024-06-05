@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Business</title>
+</head>
+<body>
+    <h1>Register Business</h1>
+
+    <p> Please enter a valid Canadian Business Number below to claim the business</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="business_number">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+    {% if error %}
+        <p> Sorry, we couldn't find that business or it's already registered. Please try again. </p>
+    {% endif %}
+</body>
+</html>
+{% endblock %}

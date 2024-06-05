@@ -77,6 +77,42 @@ class LeagueMembership(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
 
+
     # Ensures that a player can join a league only once
     class Meta:
         unique_together = ('player', 'league')
+
+
+class UserReview(models.Model):
+    author = models.CharField(max_length=60)
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    user_reviewed = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.author} on '{self.user_reviewed.username}'"
+    
+
+
+
+class RegisteredBusiness(models.Model):
+    business_number = models.IntegerField()
+    associated_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+
+
+
+class DiscountOffer(models.Model):
+    author = models.CharField(max_length=60)
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    associated_business = models.ForeignKey(RegisteredBusiness, on_delete=models.CASCADE)
+
+    
+
+    
+    
+
+
+
+

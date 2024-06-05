@@ -1,7 +1,10 @@
 from django import forms
-from .models import Post, Comment, League
+
+from .models import Post, Comment, League, UserReview, DiscountOffer
+
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
+
 
 
 
@@ -25,6 +28,24 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Leave a comment!"})
         }
+
+
+class DiscountOfferForm(forms.ModelForm):
+    class Meta:
+        model = DiscountOffer
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Creat a discount!"})
+        }
+
+class UserReviewForm(forms.ModelForm):
+    class Meta:
+        model = UserReview
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Leave a review!"})
+        }
+
 
 class PostForm(forms.ModelForm):
     tags = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Tags"}))
