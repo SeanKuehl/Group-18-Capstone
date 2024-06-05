@@ -12,7 +12,11 @@ from django.shortcuts import render
 from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
 
 from Accounts.models import CustomUser
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, get_user_model
+from django.utils.safestring import mark_safe
+from notifications.models import Notification
+
+import logging
 
 # Create your views here.
 from django.views.generic.base import TemplateView
@@ -102,6 +106,27 @@ def post_index(request):
                     # Add the tag to the post
                     post.tags.add(tag)
 
+            # Extract usernames mentioned in the post content
+            mentioned_usernames = [word[1:] for word in post.post_body.split() if word.startswith('@')]
+            
+            # Notify mentioned users
+            User = get_user_model()  # Get the custom user model
+            for username in mentioned_usernames:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    post_url = reverse('post_detail', kwargs={'pk': post.pk, 'action': 0})
+                    notification_text = f'You were mentioned in a post "{post.post_title}" by {request.user.username}.'
+                    notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
+                    #lets the hyperlink show up
+                    notification_text = mark_safe(notification_text)
+
+                    Notification.objects.create(
+                        user=mentioned_user,
+                        text=notification_text
+                    )
+                except User.DoesNotExist:
+                    pass
+
             return HttpResponseRedirect(request.path_info)
     else:
         form = PostForm()
@@ -165,18 +190,29 @@ def post_detail(request, pk, action):
 
         userAlreadyVoted = post.votes.filter(user=request.user) #this uses the post instance
         thisUserAccount = request.user
-        userMadePost = Post.objects.get(accountname=request.user, pk=pk)  #this uses the post model, responsible for all instances
-        userMadePost = (userMadePost.accountname == thisUserAccount.username)
         
+        postAuthor = post.accountname
+        currentUser = request.user.username
 
-
+        userMadePost = (postAuthor == currentUser)
+        
         if not userAlreadyVoted and not userMadePost:
             if action == upvoteAction:
                 post.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+                notification_text = f'{request.user.username} upvoted your post: "{post.post_title}".'
             elif action == downvoteAction:
                 post.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+                notification_text = f'{request.user.username} downvoted your post: "{post.post_title}".'
             else:
                 pass
+
+            # Save the notification
+
+            if action in [upvoteAction, downvoteAction]:
+                Notification.objects.create(
+                    user = post.accountname,
+                    text = notification_text
+                )
 
         else:
             #they already voted, don't let them vote again
@@ -190,6 +226,35 @@ def post_detail(request, pk, action):
             comment.author = request.user.username
             comment.post = post
             comment.save()
+
+            # Code for notif if you mention someone
+
+            # Extract usernames mentioned in the comment
+            mentioned_usernames = [word[1:] for word in comment.body.split() if word.startswith('@')]
+            
+            # Notify mentioned users
+            User = get_user_model()  # Get the custom user model
+            for username in mentioned_usernames:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    post_url = reverse('post_detail', kwargs={'pk': comment.post.pk, 'action': 0})
+                    notification_text = f'You were mentioned in a comment by {request.user.username}: "{comment.body}".'
+                    notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
+                    notification_text = mark_safe(notification_text)
+
+                    Notification.objects.create(
+                        user=mentioned_user,
+                        text=notification_text
+                    )
+                except User.DoesNotExist:
+                    pass
+
+            # Create notification
+            Notification.objects.create(
+                user=post.accountname,
+                text=f'{comment.author} commented on your post: "{post.post_title}"'
+            )
+
             return HttpResponseRedirect(request.path_info)
     else:
         form = CommentForm()
@@ -481,3 +546,16 @@ def update_league(request, league_id):
             return redirect('league_detail', league_id=league.id)
 
     return render(request, 'leagues/league_detail.html', {'league': league, 'members': league.members.all(), 'form': form})
+def notifications_list(request):
+    notifications = Notification.objects.all()
+    return render(request, 'notifications_list.html', {'notifications': notifications})
+
+def clear_all_notifications(request):
+    if request.method == 'POST':
+        Notification.objects.all().delete()
+    return redirect('notifications_list')
+
+def clear_notification(request, notification_id):
+    if request.method == 'POST':
+        Notification.objects.filter(id=notification_id).delete()
+    return redirect('notifications_list')

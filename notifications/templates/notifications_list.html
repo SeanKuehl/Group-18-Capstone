@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Notifications</h2>
+  
+  <!-- Clear All Notifications Form -->
+  <form action="{% url 'clear_all_notifications' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Clear All Notifications</button>
+  </form>
+
+  <ul>
+    {% for notification in notifications %}
+      <li>
+        {{ notification.text|safe }} - {{ notification.created_at }}
+        <!-- Clear Individual Notification Form -->
+        <form action="{% url 'clear_notification' notification.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Clear</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>No notifications</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

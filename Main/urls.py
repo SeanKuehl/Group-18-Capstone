@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path
-
+from . import views
 
 from .views import *
 
@@ -45,4 +45,7 @@ urlpatterns = [
     path('register-business/',  register_business_number, name='register_business'),
     path('view-discounts/', view_discounts_page, name='discounts'),
 
+    path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
+    path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
 ]
