@@ -2,7 +2,7 @@ import requests
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 
@@ -15,6 +15,7 @@ from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate, get_user_model
 from django.utils.safestring import mark_safe
 from notifications.models import Notification
+from .filters import contains_hate_speech, contains_curse_words
 
 import logging
 
@@ -92,19 +93,19 @@ def post_index(request):
                     
             post = form.save(commit=False)
             post.accountname = account
-            post.save()
 
-            # Process tags separately
+            if contains_hate_speech(post.post_body) or contains_curse_words(post.post_body) or contains_hate_speech(post.post_title) or contains_curse_words(post.post_title) or contains_hate_speech(post.post_community) or contains_curse_words(post.post_community):
+                return HttpResponse("Your post contains inappropriate content. Please review and try again.") 
+
             tags_input = request.POST.get('tags')
             if tags_input:
-                # Split the tags input string into individual tags
                 tags_list = tags_input.split(',')
                 for tag_name in tags_list:
-                    # Remove leading and trailing spaces from each tag
                     tag_name = tag_name.strip()
-                    tag, created = post.tags.get_or_create(name=tag_name)
-                    # Add the tag to the post
-                    post.tags.add(tag)
+                    if contains_hate_speech(tag_name) or contains_curse_words(tag_name):
+                        return HttpResponse("One or more tags contain inappropriate content. Please review and try again.")
+
+            post.save()
 
             # Extract usernames mentioned in the post content
             mentioned_usernames = [word[1:] for word in post.post_body.split() if word.startswith('@')]
@@ -225,6 +226,11 @@ def post_detail(request, pk, action):
             comment = form.save(commit=False)
             comment.author = request.user.username
             comment.post = post
+
+            # Check for hate speech and curse words
+            if contains_hate_speech(comment.body) or contains_curse_words(comment.body):
+                return HttpResponse("Your comment contains inappropriate content. Please review and try again.")
+            
             comment.save()
 
             # Code for notif if you mention someone
