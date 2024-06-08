@@ -108,7 +108,49 @@ class DiscountOffer(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     associated_business = models.ForeignKey(RegisteredBusiness, on_delete=models.CASCADE)
 
+
+
+class EventPost(models.Model):
+
+    OPEN = "O"
+    REGISTRATION_CLOSED = "RC"
+    EVENT_CLOSED = "EC"
     
+    event_status_choices = {
+        ("O", "Open to Registration"),
+        ("RC", "Closed to Registration"),
+        ("EC", "Event has been Closed"),
+        
+    }
+
+
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    post_title = models.CharField(max_length=128)
+    post_location = models.CharField(max_length=128)
+    post_date_and_time = models.CharField(max_length=128)
+    post_body = models.TextField()
+
+    
+    event_status = models.CharField(
+        max_length=2,
+        choices=event_status_choices,
+        default=OPEN,
+    )
+
+    attendees = models.ManyToManyField(CustomUser, related_name='event', through='EventAttendance')
+
+
+
+class EventAttendance(models.Model):
+    attendant = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    event = models.ForeignKey(EventPost, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+
+    # Ensures that a player can join a event only once
+    class Meta:
+        unique_together = ('attendant', 'event')
 
     
     

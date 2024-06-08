@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Post, Comment, League, UserReview, DiscountOffer
+from .models import *
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
@@ -67,4 +67,17 @@ class LeagueForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
+        }
+
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = EventPost
+        fields = ['post_title', 'post_location', 'post_date_and_time', 'post_body']
+        widgets = {
+            'post_title': forms.Textarea(attrs={"class": "form-control", "placeholder": "What is the event"}),
+            'post_location': forms.Textarea(attrs={"class": "form-control", "placeholder": "Where the event is happening"}),
+            'post_date_and_time': forms.Textarea(attrs={"class": "form-control", "placeholder": "When is the event"}),
+            'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Tell people about the event"}),
         }

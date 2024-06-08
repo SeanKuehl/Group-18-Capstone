@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 
-from Main.models import Post, Comment, Activity, League, LeagueMembership, UserReview, RegisteredBusiness, DiscountOffer
-from Main.forms import CustomUserCreationForm, DiscountOfferForm
+from Main.models import *
+from Main.forms import *
 from django.shortcuts import render  
 from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
 
@@ -565,3 +565,40 @@ def clear_notification(request, notification_id):
     if request.method == 'POST':
         Notification.objects.filter(id=notification_id).delete()
     return redirect('notifications_list')
+
+
+
+
+def ViewEvents(request):
+    event_list = EventPost.objects.all()
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            new_event = form.save(commit=False)
+            new_event.author = request.user
+            new_event.event_status = "OPEN"
+            new_event.save()
+            
+            return redirect('events')
+    else:
+        
+        form = EventForm()
+    return render(request, 'view_event_posts.html', {'form': form, 'events': event_list})
+
+
+
+def EventDetail(request, event_id):
+    this_event = EventPost.objects.get(pk=event_id)
+    num_of_people = len(EventAttendance.objects.filter(event=this_event))
+    
+    return render(request, 'event_detail.html', {'event': this_event, 'num_of_people': num_of_people})
+
+
+
+
+@login_required
+def attend_event(request, event_id):
+    event = get_object_or_404(EventPost, id=event_id)
+    if not EventAttendance.objects.filter(attendant=request.user, event=event).exists():
+        EventAttendance.objects.create(attendant=request.user, event=event)
+    return redirect('event-detail', event_id=event.id)

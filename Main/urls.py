@@ -48,4 +48,8 @@ urlpatterns = [
     path('notifications/', views.notifications_list, name='notifications_list'),
     path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
     path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
+
+    path('view-events/', ViewEvents, name='events'),
+    path('this-event/<int:event_id>', EventDetail, name='event-detail'),
+    path('attend-event/<int:event_id>', attend_event, name='attend'),
 ]
