@@ -32,6 +32,14 @@
         <button>Register</button>
     </a>
 
+    {% if author %}
+
+        <a href="{% url 'my_event' event.pk %}">
+            <button>Edit Event</button>
+        </a>
+
+    {% endif %}
+
 {% endblock page_title %}
 
 {% block page_content %}

@@ -52,4 +52,5 @@ urlpatterns = [
     path('view-events/', ViewEvents, name='events'),
     path('this-event/<int:event_id>', EventDetail, name='event-detail'),
     path('attend-event/<int:event_id>', attend_event, name='attend'),
+    path('my_event/<int:pk>', MyEventUpdateView.as_view(), name='my_event'),
 ]

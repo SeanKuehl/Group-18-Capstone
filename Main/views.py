@@ -25,6 +25,31 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q
 
+
+
+
+
+class MyEventUpdateView(UpdateView): 
+    # specify the model you want to use 
+    model = EventPost
+
+    template_name = "MyEvent.html"
+  
+    # specify the fields 
+    fields = [ 
+        "post_title", 
+        "post_location",
+        "post_date_and_time",
+        "post_body",
+        "event_status",
+
+    ] 
+  
+    # can specify success url 
+    # url to redirect after successfully 
+    # updating details 
+    success_url = reverse_lazy('home')
+
 class MyAccountAndUpdateView(UpdateView): 
     # specify the model you want to use 
     model = CustomUser
@@ -590,8 +615,12 @@ def ViewEvents(request):
 def EventDetail(request, event_id):
     this_event = EventPost.objects.get(pk=event_id)
     num_of_people = len(EventAttendance.objects.filter(event=this_event))
+    my_post = False
+
+    if this_event.author == request.user:
+        my_post = True
     
-    return render(request, 'event_detail.html', {'event': this_event, 'num_of_people': num_of_people})
+    return render(request, 'event_detail.html', {'event': this_event, 'num_of_people': num_of_people, 'author': my_post})
 
 
 
