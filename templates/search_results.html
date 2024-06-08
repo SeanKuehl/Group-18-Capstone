@@ -2,6 +2,10 @@
 {% block content %}  
 <h1>Search Results</h1>
 
+<a href="{% url 'home' %}">
+    <button>Back to Home</button>
+</a>
+
 <ul>
     {% for post in object_list %}
     <li>

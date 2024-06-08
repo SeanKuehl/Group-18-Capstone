@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <a href="{% url 'home' %}">
+    <button>Back to Home</button>
+  </a>
+
   <div class="container mt-4">
     <h2>{{ league.name }}</h2>
     <p>{{ league.description }}</p>

@@ -3,8 +3,14 @@
 {% block title %}Create League{% endblock %}
 
 {% block content %}
+  <a href="{% url 'home' %}">
+    <button>Back to Home</button>
+  </a>
+
   <div class="container mt-4">
     <h2>Create League</h2>
+    
+
     <form method="post">
       {% csrf_token %}
       

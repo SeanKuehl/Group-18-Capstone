@@ -3,6 +3,11 @@
 {% block title %}Create League{% endblock %}
 
 {% block content %}
+
+  <a href="{% url 'home' %}">
+    <button>Back to Home</button>
+  </a>
+
   <h2>Leagues</h2>
   <ul class="list-group">
     {% for league in leagues %}

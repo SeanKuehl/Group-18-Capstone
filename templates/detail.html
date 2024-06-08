@@ -9,6 +9,10 @@
 {% endblock page_title %}
 
 {% block page_content %}
+    <a href="{% url 'home' %}">
+        <button>Back to Home</button>
+    </a>
+
     <small>
         {{ post.created_on.date }} | 
         {% if post.accountname %}
