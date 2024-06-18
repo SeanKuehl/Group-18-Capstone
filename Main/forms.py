@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Post, Comment, League, UserReview, DiscountOffer
+from .models import Post, Comment, League, Team, UserReview, DiscountOffer
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
@@ -63,8 +63,18 @@ class PostForm(forms.ModelForm):
 class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'team_league']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
         }
+
+# The TeamForm is for creating and updating Team instances.
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name','members']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['members'].widget = forms.CheckboxSelectMultiple()  

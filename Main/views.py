@@ -6,10 +6,10 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 
-from Main.models import Post, Comment, Activity, League, LeagueMembership, UserReview, RegisteredBusiness, DiscountOffer
+from Main.models import Post, Comment, Activity, League, LeagueMembership, Team, UserReview, RegisteredBusiness, DiscountOffer
 from Main.forms import CustomUserCreationForm, DiscountOfferForm
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
+from Main.forms import CommentForm, PostForm, LeagueForm, TeamForm, UserReviewForm, DiscountOfferForm
 
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate, get_user_model
@@ -23,7 +23,7 @@ import logging
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
-from django.db.models import Q
+from django.db.models import Q, Count
 
 class MyAccountAndUpdateView(UpdateView): 
     # specify the model you want to use 
@@ -490,6 +490,7 @@ def create_league(request):
         if form.is_valid():
             league = form.save(commit=False)
             league.owner = request.user
+            league.team_league = form.cleaned_data['team_league']
             league.save()
             LeagueMembership.objects.create(player=request.user, league=league)
             return redirect('league_detail', league_id=league.id)
@@ -527,6 +528,7 @@ def league_list(request):
 def league_detail(request, league_id):
     league = get_object_or_404(League, id=league_id)
     members = league.members.all()
+    teams = Team.objects.filter(league=league).annotate(num_members=Count('members')) if league.team_league else None
 
     if request.method == 'POST':
         if request.user == league.owner:
@@ -537,7 +539,7 @@ def league_detail(request, league_id):
     else:
         form = LeagueForm(instance=league)
 
-    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'form': form})
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'teams': teams, 'form': form})
 
 @login_required
 def update_league(request, league_id):
@@ -552,6 +554,72 @@ def update_league(request, league_id):
             return redirect('league_detail', league_id=league.id)
 
     return render(request, 'leagues/league_detail.html', {'league': league, 'members': league.members.all(), 'form': form})
+
+@login_required
+def create_team(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if not league.team_league:
+        return redirect('league_detail', league_id=league.id)
+
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            team = form.save(commit=False)
+            team.league = league
+            team.save()
+            form.save_m2m()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = TeamForm()
+
+    return render(request, 'leagues/create_team.html', {'form': form, 'league': league})
+
+@login_required
+def team_detail(request,league_id,team_id):
+    team = get_object_or_404(Team, id=team_id)
+    is_member = team.members.filter(id=request.user.id).exists()
+    other_teams_in_league = Team.objects.filter(league=team.league).exclude(id=team_id)
+    is_member_of_other_team = other_teams_in_league.filter(members=request.user).exists()
+    return render(request, 'leagues/team_detail.html', {'team': team,'is_member': is_member, 'is_member_of_other_team': is_member_of_other_team})
+
+@login_required
+def edit_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    league = team.league
+
+    if request.method == 'POST':
+        form = TeamForm(request.POST, instance=team)
+        if form.is_valid():
+            form.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = TeamForm(instance=team)
+
+    return render(request, 'leagues/edit_team.html', {'team': team, 'form': form, 'league': league})
+
+@login_required
+def delete_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    league_id = team.league.id
+    team.delete()
+    return redirect('league_detail', league_id=league_id)
+
+@login_required
+def leave_team(request, team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    if request.user in team.members.all():
+        team.members.remove(request.user)
+
+    return redirect('team_detail', league_id=team.league.id, team_id=team.id)
+
+@login_required
+def join_team(request, team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    if request.user not in team.members.all():
+        team.members.add(request.user)
+
+    return redirect('team_detail', league_id=team.league.id, team_id=team.id)
+
 def notifications_list(request):
     notifications = Notification.objects.all()
     return render(request, 'notifications_list.html', {'notifications': notifications})

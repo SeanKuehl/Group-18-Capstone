@@ -42,6 +42,12 @@ urlpatterns = [
     path('leagues/<int:league_id>/leave/', leave_league, name='leave_league'),
     path('leagues/<int:league_id>/delete/', delete_league, name='delete_league'),
     path('leagues/<int:league_id>/update/', update_league, name='update_league'),
+    path('leagues/<int:league_id>/create_team/', create_team, name='create_team'),
+    path('leagues/<int:league_id>/teams/<int:team_id>/', team_detail, name='team_detail'),
+    path('leagues/<int:team_id>/edit_team/', edit_team, name='edit_team'),
+    path('leagues/<int:team_id>/delete_team/', delete_team, name='delete_team'),
+    path('leagues/<int:team_id>/leave_team/', leave_team, name='leave_team'),
+    path('leagues/<int:team_id>/join_team/', join_team, name='join_team'),
     path('register-business/',  register_business_number, name='register_business'),
     path('view-discounts/', view_discounts_page, name='discounts'),
 

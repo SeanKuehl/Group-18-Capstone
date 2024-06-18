@@ -68,6 +68,7 @@ class League(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(CustomUser, related_name='owned_leagues', on_delete=models.CASCADE)
     members = models.ManyToManyField(CustomUser, related_name='leagues', through='LeagueMembership')
+    team_league = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -77,11 +78,17 @@ class LeagueMembership(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
 
-
     # Ensures that a player can join a league only once
     class Meta:
         unique_together = ('player', 'league')
 
+class Team(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='teams')
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(CustomUser, related_name='teams')
+
+    def __str__(self):
+        return self.name
 
 class UserReview(models.Model):
     author = models.CharField(max_length=60)
