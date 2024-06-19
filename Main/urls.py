@@ -16,6 +16,8 @@ Including another URLconf
 """
 
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 from .views import *
@@ -34,7 +36,7 @@ urlpatterns = [
     path('report-user/<int:user_id>/', report_user, name='report_user'),
     path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
     path('remove-post/<int:pk>/', remove_post, name='remove_post'),
-    path('remove-account/<int:pk>/', remove_account, name='remove_accout'),
+    path('remove-account/<int:pk>/', remove_account, name='remove_account'),
     path('leagues/', league_list, name='league_list'),
     path('leagues/<int:league_id>/', league_detail, name='league_detail'),
     path('leagues/create/', create_league, name='create_league'),
@@ -44,8 +46,12 @@ urlpatterns = [
     path('leagues/<int:league_id>/update/', update_league, name='update_league'),
     path('register-business/',  register_business_number, name='register_business'),
     path('view-discounts/', view_discounts_page, name='discounts'),
+    path('account_page/<int:user_id>/profile_pic/', profile_pic, name='profile_pic'),
 
     path('notifications/', views.notifications_list, name='notifications_list'),
     path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
     path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

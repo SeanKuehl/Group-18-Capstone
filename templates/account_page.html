@@ -8,14 +8,12 @@
 <body>
     <h1>{{ account.username }}'s Account</h1>
 
-
     {% if current_user.admin_status %}
         <p> This account has been reported: {{ account.reported_count }}</p>
-        <a href="{% url 'remove_accout' account.id %}">
+        <a href="{% url 'remove_account' account.id %}">
             <button>Remove Account</button>
         </a>
     {% endif %}
-
 
     <h2>Posts:</h2>
     <ul>
@@ -53,9 +51,6 @@
             {{ rev.body | linebreaks }}
         </p>
     {% endfor %}
-
-
-    
 
     {% if not user.is_superuser %}
         <a href="{% url 'report_user' account.pk %}">

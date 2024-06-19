@@ -1,11 +1,7 @@
 from django import forms
-
-from .models import Post, Comment, League, UserReview, DiscountOffer
-
+from .models import Post, Comment, League, UserReview, DiscountOffer, CustomUser
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
-
-
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -68,3 +64,10 @@ class LeagueForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
         }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['profile_picture']
+
+    profile_picture = forms.ImageField(required=True)
