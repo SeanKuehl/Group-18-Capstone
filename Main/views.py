@@ -6,10 +6,10 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 
-from Main.models import Post, Comment, Activity, League, LeagueMembership, Team, UserReview, RegisteredBusiness, DiscountOffer
+from Main.models import Post, Comment, Activity, League, LeagueMembership, Team, Match, UserReview, RegisteredBusiness, DiscountOffer
 from Main.forms import CustomUserCreationForm, DiscountOfferForm
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm, LeagueForm, TeamForm, UserReviewForm, DiscountOfferForm
+from Main.forms import CommentForm, PostForm, LeagueForm, TeamForm, MatchForm, UserReviewForm, DiscountOfferForm
 
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate, get_user_model
@@ -529,6 +529,7 @@ def league_detail(request, league_id):
     league = get_object_or_404(League, id=league_id)
     members = league.members.all()
     teams = Team.objects.filter(league=league).annotate(num_members=Count('members')) if league.team_league else None
+    matches = Match.objects.filter(league=league)
 
     if request.method == 'POST':
         if request.user == league.owner:
@@ -539,7 +540,7 @@ def league_detail(request, league_id):
     else:
         form = LeagueForm(instance=league)
 
-    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'teams': teams, 'form': form})
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'teams': teams, 'matches': matches, 'form': form})
 
 @login_required
 def update_league(request, league_id):
@@ -619,6 +620,45 @@ def join_team(request, team_id):
         team.members.add(request.user)
 
     return redirect('team_detail', league_id=team.league.id, team_id=team.id)
+
+@login_required
+def create_match(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if request.method == 'POST':
+        form = MatchForm(request.POST, league=league)
+        if form.is_valid():
+            match = form.save(commit=False)
+            match.league = league
+            match.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = MatchForm(league=league)
+    return render(request, 'leagues/create_match.html', {'form': form, 'league': league})
+
+@login_required
+def edit_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    league = match.league
+    if request.method == 'POST':
+        form = MatchForm(request.POST, instance=match, league=league)
+        if form.is_valid():
+            form.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = MatchForm(instance=match, league=league)
+    return render(request, 'leagues/edit_match.html', {'form': form, 'league': league, 'match': match})
+
+@login_required
+def delete_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    league_id = match.league.id
+    match.delete()
+    return redirect('league_detail', league_id=league_id)
+
+@login_required
+def match_detail(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    return render(request, 'leagues/match_detail.html', {'match': match})
 
 def notifications_list(request):
     notifications = Notification.objects.all()

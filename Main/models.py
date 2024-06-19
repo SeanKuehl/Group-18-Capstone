@@ -90,6 +90,24 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
+class Match(models.Model):
+    league = models.ForeignKey(League, related_name='matches', on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    team1 = models.ForeignKey(Team, related_name='matches_as_team1', on_delete=models.CASCADE, null=True, blank=True)
+    team2 = models.ForeignKey(Team, related_name='matches_as_team2', on_delete=models.CASCADE, null=True, blank=True)
+    player1 = models.ForeignKey(CustomUser, related_name='matches_as_player1', on_delete=models.CASCADE, null=True, blank=True)
+    player2 = models.ForeignKey(CustomUser, related_name='matches_as_player2', on_delete=models.CASCADE, null=True, blank=True)
+    team1_score = models.IntegerField(null=True, blank=True)
+    team2_score = models.IntegerField(null=True, blank=True)
+    player1_score = models.IntegerField(null=True, blank=True)
+    player2_score = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        if self.league.team_league:
+            return f"{self.team1} vs {self.team2}"
+        else:
+            return f"{self.player1} vs {self.player2}"
+
 class UserReview(models.Model):
     author = models.CharField(max_length=60)
     body = models.TextField()

@@ -74,7 +74,7 @@
             {% for team in teams %}
             <tr>
                 <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ team.name }}</a></td>
+                <td>{{ team.name }}</td>
                 <td>{{ team.num_members }}</td>
                 <td>
                   <a href="{% url 'team_detail' league.id team.id %}" class="btn btn-sm btn-primary">View Details</a>
@@ -84,7 +84,6 @@
                       <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                   </form>
                 </td>
-
             </tr>
             {% empty %}
             <tr>
@@ -95,6 +94,47 @@
     </table>
     <a href="{% url 'create_team' league.id %}" class="btn btn-primary">Create Team</a>
     {% endif %}
+
+    <h4>Matches</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Match</th>
+                <th scope="col">Score</th>
+                <th scope="col">Date</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>
+                    {% if league.team_league %}
+                        {{ match.team1.name }} vs {{ match.team2.name }}
+                    {% else %}
+                        {{ match.player1.username }} vs {{ match.player2.username }}
+                    {% endif %}
+                </td>
+                <td>{{ match.player1_score }} - {{ match.player2_score }}</td>
+                <td>{{ match.date }}</td>
+                <td>
+                    <a href="{% url 'edit_match' match.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                    <form action="{% url 'delete_match' match.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No matches yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'create_match' league.id %}" class="btn btn-primary mt-3">Create Match</a>
 
     {% if user.is_authenticated %}
     {% if user in members %}
