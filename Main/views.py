@@ -7,6 +7,7 @@ from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, re
 from django.urls import reverse, reverse_lazy
 
 from Main.models import *
+from Main.models import RegisteredBusiness, DiscountOffer
 from Main.forms import *
 from django.shortcuts import render  
 from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
@@ -180,7 +181,7 @@ def remove_post(request, pk):
 
 
 def remove_account(request, pk):
-    account = Account.objects.get(pk=pk)
+    account = CustomUser.objects.get(pk=pk)
     account.delete()
     context = {}
     return render(request, "account_removed.html", context)
@@ -476,7 +477,7 @@ def register_business_number(request):
 
 def view_discounts_page(request):
     user_is_business = False
-    this_business = RegisteredBusiness.objects.get(associated_user=request.user)
+    this_business = RegisteredBusiness.objects.filter(associated_user=request.user).first()
     offers = DiscountOffer.objects.all()
 
     if this_business:
