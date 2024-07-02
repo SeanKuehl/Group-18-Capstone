@@ -46,7 +46,6 @@ urlpatterns = [
     path('leagues/<int:league_id>/update/', update_league, name='update_league'),
     path('register-business/',  register_business_number, name='register_business'),
     path('view-discounts/', view_discounts_page, name='discounts'),
-    path('account_page/<int:user_id>/profile_pic/', profile_pic, name='profile_pic'),
 
     path('notifications/', views.notifications_list, name='notifications_list'),
     path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
