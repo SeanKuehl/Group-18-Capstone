@@ -296,34 +296,45 @@ def user_account(request, user_id):
     else:
         # For regular users, retrieve their account and associated posts
         account = CustomUser.objects.get(pk=user_id)
+    
         if request.user.is_superuser:
             return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
         else:
             #this is where most regular users will go 
+            
             posts = Post.objects.filter(accountname=account)
+            user = get_object_or_404(CustomUser, id=user_id)
 
-            form = UserReviewForm()
+            Reviewform = UserReviewForm()
+            Profileform = UserProfileForm()
+
             if request.method == "POST":
-                form = UserReviewForm(request.POST)
-                if form.is_valid():
-                    review = form.save(commit=False)
+                Reviewform = UserReviewForm(request.POST)
+                Profileform = UserProfileForm(request.POST, request.FILES, instance=user)
+
+                if 'upload_profile_picture' in request.POST and Profileform.is_valid():
+                    Profileform.save()
+                    return HttpResponseRedirect(request.path_info)
+                
+                elif 'submit_review' in request.POST and Reviewform.is_valid():
+                    review = Reviewform.save(commit=False)
                     review.author = request.user.username
                     review.user_reviewed = request.user
                     review.save()
                     return HttpResponseRedirect(request.path_info)
-            else:
-                form = UserReviewForm()
+                else:
+                    Profileform = UserProfileForm(instance=user)
+                    Reviewform = UserReviewForm()
 
             reviews_on_this_user = UserReview.objects.filter(user_reviewed=account)
 
             return render(request, 'account_page.html', {
                 'account': account, 
                 'posts': posts, 
-                'form': form, 
+                'Profileform': Profileform, 
+                'Reviewform': Reviewform,
                 'reviews': reviews_on_this_user
-                })
-        
-        
+                }) 
 
 
 def search_account(request):
@@ -593,4 +604,5 @@ def profile_pic(request, user_id):
     else:
         form = UserProfileForm(instance=user)
 
-    return render(request, 'profile_pic.html', {'form': form, 'user':user})
+    #return render(request, 'profile_pic.html', {'form': form, 'user':user})
+    return render(request, 'account_page.html', {'form': form, 'user':user})
