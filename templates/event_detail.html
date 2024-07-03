@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% block page_title %}
+    <a href="{% url 'home' %}">
+        <button>Back to Home</button>
+    </a>
+
+    <h2 id="EventTitle">{{ event.post_title }}</h2>
+
+    <p>
+        On {{ event.created_on.date }} <b>{{ event.author }}</b> posted
+    </p>
+    
+    <p>
+        {{ event.post_location }}
+    </p>
+    <p>
+        {{ event.post_date_and_time }}
+    </p>
+    <p>
+        {{ event.event_status }}
+    </p>
+    <p>
+        {{ event.post_body | linebreaks }}
+    </p>
+
+    <p>
+        There are {{ num_of_people }} attending
+    </p>
+
+    <a href="{% url 'attend' event.pk %}">
+        <button>Register</button>
+    </a>
+
+    {% if author %}
+
+        <a href="{% url 'my_event' event.pk %}">
+            <button>Edit Event</button>
+        </a>
+
+    {% endif %}
+
+{% endblock page_title %}
+
+{% block page_content %}
+    
+{% endblock page_content %}
+
+{% endblock %}
+
+
+

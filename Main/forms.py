@@ -1,8 +1,13 @@
 
 from django import forms
-from .models import Post, Comment, League, UserReview, Team, Match, DiscountOffer, CustomUser
+
+from .models import *
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from Accounts.models import CustomUser
+
+from Main.models import Post, Comment, League, UserReview, Team, Match, DiscountOffer
+
 
 
 
@@ -57,17 +62,8 @@ class PostForm(forms.ModelForm):
             'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Post body here..."}),
         }
 
-# The LeagueForm is for creating and updating League instances.
-class LeagueForm(forms.ModelForm):
-    class Meta:
-        model = League
-        fields = ['name', 'description']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
-        }
-
-class UserProfileForm(forms.ModelForm):
+        
+ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['profile_picture']
@@ -125,3 +121,18 @@ class MatchForm(forms.ModelForm):
             self.fields['team1_score'].widget = forms.HiddenInput()
             self.fields['team2_score'].widget = forms.HiddenInput()
 
+        
+
+
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = EventPost
+        fields = ['post_title', 'post_location', 'post_date_and_time', 'post_body']
+        widgets = {
+            'post_title': forms.Textarea(attrs={"class": "form-control", "placeholder": "What is the event"}),
+            'post_location': forms.Textarea(attrs={"class": "form-control", "placeholder": "Where the event is happening"}),
+            'post_date_and_time': forms.Textarea(attrs={"class": "form-control", "placeholder": "When is the event"}),
+            'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Tell people about the event"}),
+        }

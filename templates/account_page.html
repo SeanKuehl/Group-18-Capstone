@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 <!DOCTYPE html>
@@ -7,6 +8,10 @@
 </head>
 <body>
     <h1>{{ account.username }}'s Account</h1>
+  
+    <a href="{% url 'home' %}">
+        <button>Back to Home</button>
+    </a>
 
     {% if user.profile_picture %}
         <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="150" height="150">
@@ -75,4 +80,5 @@
     
 </body>
 </html>
+
 {% endblock %}

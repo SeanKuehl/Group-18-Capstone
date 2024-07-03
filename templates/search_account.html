@@ -6,6 +6,10 @@
     <title>Search Accounts</title>
 </head>
 <body>
+    <a href="{% url 'home' %}">
+        <button>Back to Home</button>
+    </a>
+
     <h1>Search Accounts</h1>
     <form method="get">
         <input type="text" name="q" placeholder="Search accounts..." value="{{ query }}">

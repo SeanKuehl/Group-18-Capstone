@@ -1,5 +1,9 @@
 {% extends "index.html" %}
 
 {% block page_title %}
+<a href="{% url 'home' %}">
+    <button>Back to Home</button>
+</a>
+
 <h2>{{ tag }}</h2>
 {% endblock page_title %}

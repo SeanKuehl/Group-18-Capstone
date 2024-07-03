@@ -7,8 +7,12 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, Stream
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 
-from Main.models import Post, Comment, Activity, League, LeagueMembership, Team, Match, UserReview, RegisteredBusiness, DiscountOffer
-from Main.forms import CustomUserCreationForm, DiscountOfferForm
+
+from Main.models import *
+from Main.models import RegisteredBusiness, DiscountOffer
+from Main.forms import *
+
+
 from django.shortcuts import render  
 
 from Main.forms import CommentForm, PostForm, LeagueForm, TeamForm, MatchForm, UserReviewForm, DiscountOfferForm, UserProfileForm
@@ -25,6 +29,31 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q, Count
+
+
+
+
+
+class MyEventUpdateView(UpdateView): 
+    # specify the model you want to use 
+    model = EventPost
+
+    template_name = "MyEvent.html"
+  
+    # specify the fields 
+    fields = [ 
+        "post_title", 
+        "post_location",
+        "post_date_and_time",
+        "post_body",
+        "event_status",
+
+    ] 
+  
+    # can specify success url 
+    # url to redirect after successfully 
+    # updating details 
+    success_url = reverse_lazy('home')
 
 class MyAccountAndUpdateView(UpdateView): 
     # specify the model you want to use 
@@ -156,7 +185,7 @@ def remove_post(request, pk):
 
 
 def remove_account(request, pk):
-    account = Account.objects.get(pk=pk)
+    account = CustomUser.objects.get(pk=pk)
     account.delete()
     context = {}
     return render(request, "account_removed.html", context)
@@ -477,7 +506,7 @@ def register_business_number(request):
 
 def view_discounts_page(request):
     user_is_business = False
-    this_business = RegisteredBusiness.objects.get(associated_user=request.user)
+    this_business = RegisteredBusiness.objects.filter(associated_user=request.user).first()
     offers = DiscountOffer.objects.all()
 
     if this_business:
@@ -702,6 +731,48 @@ def clear_notification(request, notification_id):
         Notification.objects.filter(id=notification_id).delete()
     return redirect('notifications_list')
 
+
+
+
+
+def ViewEvents(request):
+    event_list = EventPost.objects.all()
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            new_event = form.save(commit=False)
+            new_event.author = request.user
+            new_event.event_status = "OPEN"
+            new_event.save()
+            
+            return redirect('events')
+    else:
+        
+        form = EventForm()
+    return render(request, 'view_event_posts.html', {'form': form, 'events': event_list})
+
+
+
+def EventDetail(request, event_id):
+    this_event = EventPost.objects.get(pk=event_id)
+    num_of_people = len(EventAttendance.objects.filter(event=this_event))
+    my_post = False
+
+    if this_event.author == request.user:
+        my_post = True
+    
+    return render(request, 'event_detail.html', {'event': this_event, 'num_of_people': num_of_people, 'author': my_post})
+
+
+
+
+@login_required
+def attend_event(request, event_id):
+    event = get_object_or_404(EventPost, id=event_id)
+    if not EventAttendance.objects.filter(attendant=request.user, event=event).exists():
+        EventAttendance.objects.create(attendant=request.user, event=event)
+    return redirect('event-detail', event_id=event.id)
+
 def profile_pic(request, user_id):
 
     user = get_object_or_404(CustomUser, id=user_id)
@@ -717,3 +788,4 @@ def profile_pic(request, user_id):
 
     #return render(request, 'profile_pic.html', {'form': form, 'user':user})
     return render(request, 'account_page.html', {'form': form, 'user':user})
+

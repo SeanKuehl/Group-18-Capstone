@@ -3,35 +3,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Discount Offers</title>
+    <title>Events</title>
 </head>
 <body>
-    <h1>Current Special Offers</h1>
+    <h1>Current Events</h1>
 
     <a href="{% url 'home' %}">
     <button>Back to Home</button>
     </a>
-    {% if is_business %}
+    
 
-    <h3>Create an offer:</h3>
+    <h3>Create an Event:</h3>
     <form method="post">
         {% csrf_token %}
         
         <div>
-            {{ form.body }}
+            {{ form }}
         </div>
+
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    {% endif %}
+    
 
-    <h3>Current Offers:</h3>
-    {% for offer in offers %}
+    <h3>Current Events:</h3>
+    {% for event in events %}
         <p>
-            On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
+            On {{ event.created_on.date }} <b>{{ event.author }}</b> posted
         </p>
+        <a href="{% url 'event-detail' event.pk %}">
         <p>
-            {{ offer.body | linebreaks }}
+            {{ event.post_title }}
+        </p>
+        </a>
+        
+        <p>
+            {{ event.post_body | linebreaks }}
         </p>
     {% endfor %}
 
