@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Create Match{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Create Match in {{ league.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+      
+        <div class="mb-3">
+            <label for="{{ form.date.id_for_label }}" class="form-label">Match Date</label>
+            {{ form.date }}
+            {% for error in form.date.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {% if league.is_team_league %}
+        <div class="mb-3">
+            <label for="{{ form.team1.id_for_label }}" class="form-label">Team 1</label>
+            {{ form.team1 }}
+            {% for error in form.team1.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.team2.id_for_label }}" class="form-label">Team 2</label>
+            {{ form.team2 }}
+            {% for error in form.team2.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% else %}
+
+        <div class="mb-3">
+            <label for="{{ form.player1.id_for_label }}" class="form-label">Player 1</label>
+            {{ form.player1 }}
+            {% for error in form.player1.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.player2.id_for_label }}" class="form-label">Player 2</label>
+            {{ form.player2 }}
+            {% for error in form.player2.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+      
+        <button type="submit" class="btn btn-primary">Create Match</button>
+    </form>
+    <a href="{% url 'league_detail' league_id=league.id %}" class="btn btn-secondary mt-3">Back to League</a>
+  </div>
+{% endblock %}
