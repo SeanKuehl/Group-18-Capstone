@@ -62,8 +62,8 @@ class PostForm(forms.ModelForm):
             'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Post body here..."}),
         }
 
-        
- class UserProfileForm(forms.ModelForm):
+
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['profile_picture']
