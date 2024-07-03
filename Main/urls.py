@@ -16,6 +16,8 @@ Including another URLconf
 """
 
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 from .views import *
@@ -34,7 +36,7 @@ urlpatterns = [
     path('report-user/<int:user_id>/', report_user, name='report_user'),
     path('get-existing-tags/', get_existing_tags, name='get_existing_tags'),
     path('remove-post/<int:pk>/', remove_post, name='remove_post'),
-    path('remove-account/<int:pk>/', remove_account, name='remove_accout'),
+    path('remove-account/<int:pk>/', remove_account, name='remove_account'),
     path('leagues/', league_list, name='league_list'),
     path('leagues/<int:league_id>/', league_detail, name='league_detail'),
     path('leagues/create/', create_league, name='create_league'),
@@ -42,6 +44,16 @@ urlpatterns = [
     path('leagues/<int:league_id>/leave/', leave_league, name='leave_league'),
     path('leagues/<int:league_id>/delete/', delete_league, name='delete_league'),
     path('leagues/<int:league_id>/update/', update_league, name='update_league'),
+    path('leagues/<int:league_id>/create_team/', create_team, name='create_team'),
+    path('leagues/<int:league_id>/teams/<int:team_id>/', team_detail, name='team_detail'),
+    path('leagues/<int:team_id>/edit_team/', edit_team, name='edit_team'),
+    path('leagues/<int:team_id>/delete_team/', delete_team, name='delete_team'),
+    path('leagues/<int:team_id>/leave_team/', leave_team, name='leave_team'),
+    path('leagues/<int:team_id>/join_team/', join_team, name='join_team'),
+    path('league/<int:league_id>/create_match/', create_match, name='create_match'),
+    path('match/<int:match_id>/edit/', edit_match, name='edit_match'),
+    path('match/<int:match_id>/delete/', delete_match, name='delete_match'),
+    path('match/<int:match_id>/', match_detail, name='match_detail'),
     path('register-business/',  register_business_number, name='register_business'),
     path('view-discounts/', view_discounts_page, name='discounts'),
 
@@ -54,3 +66,6 @@ urlpatterns = [
     path('attend-event/<int:event_id>', attend_event, name='attend'),
     path('my_event/<int:pk>', MyEventUpdateView.as_view(), name='my_event'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

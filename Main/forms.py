@@ -1,9 +1,12 @@
+
 from django import forms
 
 from .models import *
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from Accounts.models import CustomUser
+
+from Main.models import Post, Comment, League, UserReview, Team, Match, DiscountOffer
 
 
 
@@ -59,15 +62,67 @@ class PostForm(forms.ModelForm):
             'post_body': forms.Textarea(attrs={"class": "form-control", "placeholder": "Post body here..."}),
         }
 
+        
+ class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['profile_picture']
+
+    profile_picture = forms.ImageField(required=True)
+
+
+
+
+
+
+
+
 # The LeagueForm is for creating and updating League instances.
 class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'team_league']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
         }
+
+# The TeamForm is for creating and updating Team instances.
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name','members']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['members'].widget = forms.CheckboxSelectMultiple()  
+
+# The MatchForm is for creating and updating Match instances.
+class MatchForm(forms.ModelForm):
+    class Meta:
+        model = Match
+        fields = ['date', 'team1', 'team2', 'player1', 'player2', 'team1_score', 'team2_score', 'player1_score', 'player2_score']
+    
+    def __init__(self, *args, **kwargs):
+        league = kwargs.pop('league')
+        super().__init__(*args, **kwargs)
+        if league.team_league:
+            self.fields['team1'].queryset = league.teams.all()
+            self.fields['team2'].queryset = league.teams.all()
+            self.fields['player1'].widget = forms.HiddenInput()
+            self.fields['player2'].widget = forms.HiddenInput()
+            self.fields['player1_score'].widget = forms.HiddenInput()
+            self.fields['player2_score'].widget = forms.HiddenInput()
+        else:
+            self.fields['player1'].queryset = CustomUser.objects.filter(leagues=league)
+            self.fields['player2'].queryset = CustomUser.objects.filter(leagues=league)
+            self.fields['team1'].widget = forms.HiddenInput()
+            self.fields['team2'].widget = forms.HiddenInput()
+            self.fields['team1_score'].widget = forms.HiddenInput()
+            self.fields['team2_score'].widget = forms.HiddenInput()
+
+        
+
 
 
 

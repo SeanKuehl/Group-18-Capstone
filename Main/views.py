@@ -1,16 +1,22 @@
 import requests
+import time
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+
 
 from Main.models import *
 from Main.models import RegisteredBusiness, DiscountOffer
 from Main.forms import *
+
+
 from django.shortcuts import render  
-from Main.forms import CommentForm, PostForm, LeagueForm, UserReviewForm, DiscountOfferForm
+
+from Main.forms import CommentForm, PostForm, LeagueForm, TeamForm, MatchForm, UserReviewForm, DiscountOfferForm, UserProfileForm
+
 
 from Accounts.models import CustomUser
 from django.contrib.auth import login, authenticate, get_user_model
@@ -18,13 +24,11 @@ from django.utils.safestring import mark_safe
 from notifications.models import Notification
 from .filters import contains_hate_speech, contains_curse_words
 
-import logging
-
 # Create your views here.
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
-from django.db.models import Q
+from django.db.models import Q, Count
 
 
 
@@ -226,10 +230,14 @@ def post_detail(request, pk, action):
         if not userAlreadyVoted and not userMadePost:
             if action == upvoteAction:
                 post.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+                post_url = reverse('post_detail', kwargs={'pk': post.pk, 'action': 0})
                 notification_text = f'{request.user.username} upvoted your post: "{post.post_title}".'
+                notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
             elif action == downvoteAction:
                 post.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+                post_url = reverse('post_detail', kwargs={'pk': post.pk, 'action': 0})
                 notification_text = f'{request.user.username} downvoted your post: "{post.post_title}".'
+                notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
             else:
                 pass
 
@@ -282,9 +290,14 @@ def post_detail(request, pk, action):
                     pass
 
             # Create notification
+
+            post_url = reverse('post_detail', kwargs={'pk': post.pk, 'action': 0})
+            notification_text = f'{comment.author} commented on your post: "{post.post_title}"'
+            notification_text += f' Click <a href="{post_url}">here</a> to view the post.'
+
             Notification.objects.create(
                 user=post.accountname,
-                text=f'{comment.author} commented on your post: "{post.post_title}"'
+                text=notification_text
             )
 
             return HttpResponseRedirect(request.path_info)
@@ -306,6 +319,7 @@ def post_detail(request, pk, action):
     return render(request, "detail.html", context)
 
 def user_account(request, user_id):
+
     if user_id == 0:
         # For the placeholder superuser ID, display all posts
         posts = Post.objects.all()
@@ -313,30 +327,45 @@ def user_account(request, user_id):
     else:
         # For regular users, retrieve their account and associated posts
         account = CustomUser.objects.get(pk=user_id)
+    
         if request.user.is_superuser:
             return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
         else:
             #this is where most regular users will go 
+            
             posts = Post.objects.filter(accountname=account)
+            user = get_object_or_404(CustomUser, id=user_id)
 
-            form = UserReviewForm()
+            Reviewform = UserReviewForm()
+            Profileform = UserProfileForm()
+
             if request.method == "POST":
-                form = UserReviewForm(request.POST)
-                if form.is_valid():
-                    review = form.save(commit=False)
+                Reviewform = UserReviewForm(request.POST)
+                Profileform = UserProfileForm(request.POST, request.FILES, instance=user)
+
+                if 'upload_profile_picture' in request.POST and Profileform.is_valid():
+                    Profileform.save()
+                    return HttpResponseRedirect(request.path_info)
+                
+                elif 'submit_review' in request.POST and Reviewform.is_valid():
+                    review = Reviewform.save(commit=False)
                     review.author = request.user.username
                     review.user_reviewed = request.user
                     review.save()
                     return HttpResponseRedirect(request.path_info)
-            else:
-                form = UserReviewForm()
+                else:
+                    Profileform = UserProfileForm(instance=user)
+                    Reviewform = UserReviewForm()
 
             reviews_on_this_user = UserReview.objects.filter(user_reviewed=account)
 
-            return render(request, 'account_page.html', {'account': account, 'posts': posts, 'form': form, 'reviews': reviews_on_this_user})
-
-
-    
+            return render(request, 'account_page.html', {
+                'account': account, 
+                'posts': posts, 
+                'Profileform': Profileform, 
+                'Reviewform': Reviewform,
+                'reviews': reviews_on_this_user
+                }) 
 
 
 def search_account(request):
@@ -516,6 +545,7 @@ def create_league(request):
         if form.is_valid():
             league = form.save(commit=False)
             league.owner = request.user
+            league.team_league = form.cleaned_data['team_league']
             league.save()
             LeagueMembership.objects.create(player=request.user, league=league)
             return redirect('league_detail', league_id=league.id)
@@ -553,6 +583,8 @@ def league_list(request):
 def league_detail(request, league_id):
     league = get_object_or_404(League, id=league_id)
     members = league.members.all()
+    teams = Team.objects.filter(league=league).annotate(num_members=Count('members')) if league.team_league else None
+    matches = Match.objects.filter(league=league)
 
     if request.method == 'POST':
         if request.user == league.owner:
@@ -563,7 +595,7 @@ def league_detail(request, league_id):
     else:
         form = LeagueForm(instance=league)
 
-    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'form': form})
+    return render(request, 'leagues/league_detail.html', {'league': league, 'members': members, 'teams': teams, 'matches': matches, 'form': form})
 
 @login_required
 def update_league(request, league_id):
@@ -578,6 +610,113 @@ def update_league(request, league_id):
             return redirect('league_detail', league_id=league.id)
 
     return render(request, 'leagues/league_detail.html', {'league': league, 'members': league.members.all(), 'form': form})
+
+
+@login_required
+def create_team(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if not league.team_league:
+        return redirect('league_detail', league_id=league.id)
+
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            team = form.save(commit=False)
+            team.league = league
+            team.save()
+            form.save_m2m()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = TeamForm()
+
+    return render(request, 'leagues/create_team.html', {'form': form, 'league': league})
+
+@login_required
+def team_detail(request,league_id,team_id):
+    team = get_object_or_404(Team, id=team_id)
+    is_member = team.members.filter(id=request.user.id).exists()
+    other_teams_in_league = Team.objects.filter(league=team.league).exclude(id=team_id)
+    is_member_of_other_team = other_teams_in_league.filter(members=request.user).exists()
+    return render(request, 'leagues/team_detail.html', {'team': team,'is_member': is_member, 'is_member_of_other_team': is_member_of_other_team})
+
+@login_required
+def edit_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    league = team.league
+
+    if request.method == 'POST':
+        form = TeamForm(request.POST, instance=team)
+        if form.is_valid():
+            form.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = TeamForm(instance=team)
+
+    return render(request, 'leagues/edit_team.html', {'team': team, 'form': form, 'league': league})
+
+@login_required
+def delete_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    league_id = team.league.id
+    team.delete()
+    return redirect('league_detail', league_id=league_id)
+
+@login_required
+def leave_team(request, team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    if request.user in team.members.all():
+        team.members.remove(request.user)
+
+    return redirect('team_detail', league_id=team.league.id, team_id=team.id)
+
+@login_required
+def join_team(request, team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    if request.user not in team.members.all():
+        team.members.add(request.user)
+
+    return redirect('team_detail', league_id=team.league.id, team_id=team.id)
+
+@login_required
+def create_match(request, league_id):
+    league = get_object_or_404(League, id=league_id)
+    if request.method == 'POST':
+        form = MatchForm(request.POST, league=league)
+        if form.is_valid():
+            match = form.save(commit=False)
+            match.league = league
+            match.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = MatchForm(league=league)
+    return render(request, 'leagues/create_match.html', {'form': form, 'league': league})
+
+@login_required
+def edit_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    league = match.league
+    if request.method == 'POST':
+        form = MatchForm(request.POST, instance=match, league=league)
+        if form.is_valid():
+            form.save()
+            return redirect('league_detail', league_id=league.id)
+    else:
+        form = MatchForm(instance=match, league=league)
+    return render(request, 'leagues/edit_match.html', {'form': form, 'league': league, 'match': match})
+
+@login_required
+def delete_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    league_id = match.league.id
+    match.delete()
+    return redirect('league_detail', league_id=league_id)
+
+@login_required
+def match_detail(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    return render(request, 'leagues/match_detail.html', {'match': match})
+
+
 def notifications_list(request):
     notifications = Notification.objects.all()
     return render(request, 'notifications_list.html', {'notifications': notifications})
@@ -591,6 +730,7 @@ def clear_notification(request, notification_id):
     if request.method == 'POST':
         Notification.objects.filter(id=notification_id).delete()
     return redirect('notifications_list')
+
 
 
 
@@ -632,3 +772,20 @@ def attend_event(request, event_id):
     if not EventAttendance.objects.filter(attendant=request.user, event=event).exists():
         EventAttendance.objects.create(attendant=request.user, event=event)
     return redirect('event-detail', event_id=event.id)
+
+def profile_pic(request, user_id):
+
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            form.save()
+            return redirect('post_index')
+    else:
+        form = UserProfileForm(instance=user)
+
+    #return render(request, 'profile_pic.html', {'form': form, 'user':user})
+    return render(request, 'account_page.html', {'form': form, 'user':user})
+
