@@ -9,6 +9,7 @@ class CustomUser(AbstractUser):
     account_bio = models.TextField()
     reported_count = models.PositiveIntegerField(default=0)
     admin_status = models.BooleanField(default=False)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     def __str__(self):
         return self.username

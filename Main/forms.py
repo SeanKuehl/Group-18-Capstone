@@ -1,10 +1,8 @@
-from django import forms
 
-from .models import Post, Comment, League, Team, Match, UserReview, DiscountOffer
+from django import forms
+from .models import Post, Comment, League, UserReview, Team, Match, DiscountOffer, CustomUser
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from Accounts.models import CustomUser
-
 
 
 
@@ -63,6 +61,30 @@ class PostForm(forms.ModelForm):
 class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter league description'}),
+        }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['profile_picture']
+
+    profile_picture = forms.ImageField(required=True)
+
+
+
+
+
+
+
+
+# The LeagueForm is for creating and updating League instances.
+class LeagueForm(forms.ModelForm):
+    class Meta:
+        model = League
         fields = ['name', 'description', 'team_league']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter league name'}),
@@ -102,3 +124,4 @@ class MatchForm(forms.ModelForm):
             self.fields['team2'].widget = forms.HiddenInput()
             self.fields['team1_score'].widget = forms.HiddenInput()
             self.fields['team2_score'].widget = forms.HiddenInput()
+
