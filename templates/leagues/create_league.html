@@ -23,6 +23,11 @@
           <div class="text-danger">{{ error }}</div>
         {% endfor %}
       </div>
+
+      <div class="form-check">
+        {{ form.team_league }}
+        <label class="form-check-label" for="{{ form.team_league.id_for_label }}">Is this a team league?</label>
+      </div>
       
       <button type="submit" class="btn btn-primary">Create</button>
     </form>

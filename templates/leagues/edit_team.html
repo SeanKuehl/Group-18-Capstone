@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Team - {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Team - {{ team.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Team Name</label>
+            {{ form.name }}
+            {% for error in form.name.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_members" class="form-label">Team Members</label>
+            <select name="members" id="id_members" multiple class="form-select">
+                {% for member in team.league.members.all %}
+                <option value="{{ member.id }}" {% if member in team.members.all %}selected{% endif %}>{{ member.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'league_detail' team.league.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
