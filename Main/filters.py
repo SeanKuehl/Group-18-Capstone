@@ -3,9 +3,9 @@ import re
 from django.conf import settings
 
 def load_terms(filename):
-    #file_path = os.path.join(settings.BASE_DIR, 'Group-18-Capstone', 'resources', filename)
+    #file_path = os.path.join(settings.BASE_DIR, 'Group-18-Capstone', 'Resources', filename)
 
-    file_path = os.path.join(settings.BASE_DIR, 'Main', 'resources', filename)
+    file_path = os.path.join(settings.BASE_DIR, 'Main', 'Resources', filename)
 
     with open(file_path, 'r', encoding='utf-8') as file:
         terms = [line.strip() for line in file if line.strip()]

@@ -39,7 +39,9 @@ API_KEY = '9c24e27f6bf731f2d7c6b366cabdd296'
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['Sonar.pythonanywhere.com', '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ['https://Sonar.pythonanywhere.com']
 
 
 # Application definition
