@@ -780,10 +780,10 @@ def profile(request):
         steam_account = SocialAccount.objects.get(user=request.user, provider='steam')
         steam_id = steam_account.extra_data['sub']
         steam_name = steam_account.extra_data['personaname']
-        account = Account.objects.get(user_owner=request.user)
-        account.steam_id = steam_id
-        account.steam_name = steam_name
-        account.save()
+        CustomUser = CustomUser.objects.get(user_owner=request.user)
+        CustomUser.steam_id = steam_id
+        CustomUser.steam_name = steam_name
+        CustomUser.save()
     except SocialAccount.DoesNotExist:
         steam_account = None
     return render(request, 'profile.html', {'steam_account': steam_account})
