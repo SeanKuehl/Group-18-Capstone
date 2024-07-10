@@ -61,11 +61,16 @@ urlpatterns = [
     path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
     path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
 
+    path('search_game/<str:game_name>/', views.search_game_on_steam, name='search_game_on_steam'),
+    path('accounts/', include('allauth.urls')),
+    
     path('view-events/', ViewEvents, name='events'),
     path('this-event/<int:event_id>', EventDetail, name='event-detail'),
     path('attend-event/<int:event_id>', attend_event, name='attend'),
     path('my_event/<int:pk>', MyEventUpdateView.as_view(), name='my_event'),
 ]
+
+urlpatterns += default_urlpatterns(SteamProvider)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
