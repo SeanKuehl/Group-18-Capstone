@@ -12,6 +12,9 @@ from Main.models import *
 from Main.models import RegisteredBusiness, DiscountOffer
 from Main.forms import *
 
+from Main.steam import get_game_details
+from django.contrib.auth import login, authenticate
+from allauth.socialaccount.models import SocialAccount
 
 from django.shortcuts import render  
 
@@ -29,7 +32,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Q, Count
-
+from django.contrib.auth.models import User
 
 
 
@@ -104,6 +107,14 @@ class SearchResultsView(ListView):
             object_list = Post.objects.all()
 
         return object_list
+
+def search_game_on_steam(request, game_name):
+    game_id = get_game_details(game_name)
+    if game_id:
+        game_url = f"https://store.steampowered.com/app/{game_id}/"
+        return redirect(game_url)
+    else:
+        return render(request, 'game_not_found.html', {'game_name': game_name})
 
 @login_required
 def post_index(request):
@@ -763,8 +774,19 @@ def EventDetail(request, event_id):
     
     return render(request, 'event_detail.html', {'event': this_event, 'num_of_people': num_of_people, 'author': my_post})
 
-
-
+@login_required
+def profile(request):
+    try:
+        steam_account = SocialAccount.objects.get(user=request.user, provider='steam')
+        steam_id = steam_account.extra_data['sub']
+        steam_name = steam_account.extra_data['personaname']
+        account = Account.objects.get(user_owner=request.user)
+        account.steam_id = steam_id
+        account.steam_name = steam_name
+        account.save()
+    except SocialAccount.DoesNotExist:
+        steam_account = None
+    return render(request, 'profile.html', {'steam_account': steam_account})
 
 @login_required
 def attend_event(request, event_id):
