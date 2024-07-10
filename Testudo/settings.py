@@ -15,13 +15,15 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from allauth.socialaccount import providers
+from myapp.providers.steam.provider import SteamProvider
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-_ejytww^gq8jug$$ua(k%&p4e4sf6ot&x#(n2$!u--8yep0tt8'
-
+STEAM_API_KEY = '35DED161963F2D948761AC99A921E56D';
 API_KEY = '9c24e27f6bf731f2d7c6b366cabdd296'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -43,6 +45,10 @@ INSTALLED_APPS = [
     'Accounts',
     'bootstrap5',
     'notifications',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.openid',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +63,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'Testudo.urls'
