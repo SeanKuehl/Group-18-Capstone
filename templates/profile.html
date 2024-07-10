@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>{{ user.username }}'s Profile</h1>
+    {% if steam_account %}
+    <p>Steam ID: {{ steam_account.extra_data.sub }}</p>
+    <p>Steam Name: {{ steam_account.extra_data.personaname }}</p>
+    <a href="https://steamcommunity.com/profiles/{{ steam_account.extra_data.sub }}" target="_blank">View Steam Profile</a>
+    {% else %}
+    <p>No Steam account linked.</p>
+    <a href="{% provider_login_url 'steam' %}">Link Steam Account</a>
+    {% endif %}
+    <a href="{% url 'update_profile' %}">Update Profile</a>
+</body>
+</html>
