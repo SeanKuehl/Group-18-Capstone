@@ -457,3 +457,180 @@ class DeleteLeagueTestCase(TestCase):
 
         # Verify that the league still exists in the database
         self.assertTrue(League.objects.filter(id=league_to_delete.id).exists())
+
+class CreateTeamTestCase(TestCase):
+
+    # Set up for testing
+    def setUp(self):
+
+        self.client = Client()
+
+        self.user = CustomUser.objects.create_user(
+            username="TestUser", 
+            email="test@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.user2 = CustomUser.objects.create_user(
+            username="TestUser2", 
+            email="test2@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.league = League.objects.create(
+            name='Test League',
+            description='This is a test league.',
+            owner=self.user,
+            team_league=True  # Assuming this is a team league
+        )
+        LeagueMembership.objects.create(player=self.user, league=self.league)
+        LeagueMembership.objects.create(player=self.user2, league=self.league)
+
+    # Test that user can create a team 
+    def test_create_team(self):
+        self.client.login(username='TestUser', password='top_secret')
+
+        team_data = {
+            'name': 'Test Team',
+            'members': [self.user.id]  # Assuming user is a member of the league
+        }
+
+        response = self.client.post(reverse('create_team', kwargs={'league_id': self.league.id}), team_data)
+        
+        self.assertEqual(response.status_code, 302)                                         # Check for successful redirect
+        self.assertTrue(Team.objects.filter(name='Test Team', league=self.league).exists()) # Verify that team was created
+
+class ReadTeamTestCase(TestCase):
+
+     # Set up for testing
+    def setUp(self):
+
+        self.client = Client()
+
+        self.user = CustomUser.objects.create_user(
+            username="TestUser", 
+            email="test@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.user2 = CustomUser.objects.create_user(
+            username="TestUser2", 
+            email="test2@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.league = League.objects.create(
+            name='Test League',
+            description='This is a test league.',
+            owner=self.user,
+            team_league=True  # Assuming this is a team league
+        )
+        LeagueMembership.objects.create(player=self.user, league=self.league)
+        LeagueMembership.objects.create(player=self.user2, league=self.league)
+
+    # Test that user can view team details
+    def test_view_team_detail(self):
+        self.client.login(username='TestUser', password='top_secret')
+
+        team = Team.objects.create(name='Test Team', league=self.league)
+        team.members.add(self.user)
+
+        response = self.client.get(reverse('team_detail', kwargs={'league_id': self.league.id, 'team_id': team.id}))
+
+        self.assertEqual(response.status_code, 200)  # Check for successful response
+        self.assertContains(response, 'Test Team')   # Check if team name is in response content
+
+class UpdateTeamTestCase(TestCase):
+
+    # Set up for testing
+    def setUp(self):
+
+        self.client = Client()
+
+        self.user = CustomUser.objects.create_user(
+            username="TestUser", 
+            email="test@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.user2 = CustomUser.objects.create_user(
+            username="TestUser2", 
+            email="test2@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.league = League.objects.create(
+            name='Test League',
+            description='This is a test league.',
+            owner=self.user,
+            team_league=True  # Assuming this is a team league
+        )
+        LeagueMembership.objects.create(player=self.user, league=self.league)
+        LeagueMembership.objects.create(player=self.user2, league=self.league)
+
+    # Test that user can update team details
+    def test_update_team(self):
+        self.client.login(username='TestUser', password='top_secret')
+
+        team = Team.objects.create(name='Test Team', league=self.league)
+        team.members.add(self.user)
+
+        updated_data = {
+            'name': 'Updated Team Name',
+            'members': [self.user.id]
+        }
+
+        response = self.client.post(reverse('edit_team', kwargs={'team_id': team.id}), updated_data)
+        
+        self.assertEqual(response.status_code, 302)       # Check for successful redirect
+        team.refresh_from_db()                            # Refresh the team object from the database
+        
+        self.assertEqual(team.name, 'Updated Team Name')  # Check if team name was updated
+
+class DeleteTeamTestCase(TestCase):
+
+    # Set up for testing
+    def setUp(self):
+
+        self.client = Client()
+
+        self.user = CustomUser.objects.create_user(
+            username="TestUser", 
+            email="test@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.user2 = CustomUser.objects.create_user(
+            username="TestUser2", 
+            email="test2@gmail.com", 
+            password="top_secret", 
+            account_bio="hi",
+        )
+
+        self.league = League.objects.create(
+            name='Test League',
+            description='This is a test league.',
+            owner=self.user,
+            team_league=True  # Assuming this is a team league
+        )
+        LeagueMembership.objects.create(player=self.user, league=self.league)
+        LeagueMembership.objects.create(player=self.user2, league=self.league)
+
+    # Test that user can delete team
+    def test_delete_team(self):
+        self.client.login(username='TestUser', password='top_secret')
+
+        team = Team.objects.create(name='Test Team', league=self.league)
+        team.members.add(self.user)
+
+        response = self.client.post(reverse('delete_team', kwargs={'team_id': team.id}))
+
+        self.assertEqual(response.status_code, 302)                 # Check for successful redirect after deletion
+        self.assertFalse(Team.objects.filter(id=team.id).exists())  # Check if team was deleted
