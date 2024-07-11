@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from allauth.socialaccount.providers.oauth2.urls import default_urlpatterns
+from .provider import SteamProvider
 
 from .views import *
 
