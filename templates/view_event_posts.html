@@ -1,53 +1,55 @@
 {% extends "base.html" %}
+
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Events</title>
-</head>
-<body>
+    <style>
+        .post-container {
+            background-color: RoyalBlue;
+            padding: 10px;
+            margin: 10px 0;
+            color: white;
+            text-align: center;
+        }
+
+        /* removes the hyperlink styling (i.e., the underline and blue text) */
+        .post-container h3 a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .post-container a {
+            color: white;
+            text-decoration: none;
+        }
+
+    </style>
+
     <h1>Current Events</h1>
 
     <a href="{% url 'home' %}">
-    <button type="button" class="btn btn-dark">Back to Home</button>
+        <button type="button" class="btn btn-dark">Back to Home</button>
     </a>
-    
 
     <h3>Create an Event:</h3>
     <form method="post">
         {% csrf_token %}
-        
         <div>
             {{ form }}
         </div>
-
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    
-
     <h3>Current Events:</h3>
     {% for event in events %}
-        <p>
-            On {{ event.created_on.date }} <b>{{ event.author }}</b> posted
-        </p>
-        <a href="{% url 'event-detail' event.pk %}">
-        <p>
-            {{ event.post_title }}
-        </p>
-        </a>
-        
-        <p>
-            {{ event.post_body | linebreaks }}
-        </p>
+        <div class="post-container">
+            <p>
+                On {{ event.created_on.date }} <b>{{ event.author }}</b> posted
+            </p>
+            <a href="{% url 'event-detail' event.pk %}" class="d-inline-flex focus-ring py-0.5 px-2 text-decoration-none border rounded-2" style="--bs-focus-ring-color: rgba(var(--bs-success-rgb), .25)">
+                {{ event.post_title }}
+            </a>
+            <p>
+                {{ event.post_body | linebreaks }}
+            </p>
+        </div>
     {% endfor %}
-
-
-
-    
-
-    
-    
-</body>
-</html>
 {% endblock %}
