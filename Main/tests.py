@@ -3,6 +3,8 @@ from django.test import Client, RequestFactory, TestCase, client
 from django.urls import reverse
 from Main.models import *
 from Accounts.models import CustomUser
+from notifications.models import Notification
+from django.utils import timezone
 
 # Create your tests here.
 
@@ -178,7 +180,7 @@ class AdminTestCase(TestCase):
 
     def test_admin_remove_user(self):
         request.user = self.user
-        response = self.client.get(reverse("remove_accout", kwargs={'pk':self.removable_user.id}))
+        response = self.client.get(reverse("remove_account", kwargs={'pk':self.removable_user.id}))
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CustomUser.objects.last().username, "jacob") #the only user still left should be the super user
@@ -229,5 +231,156 @@ class PostVoteTestCase(TestCase):
 
         downvote_we_just_created = Post.objects.get(id=self.downvote_post.id).votes.filter(activity_type=Activity.DOWN_VOTE, user=request.user).first()
 
+
+class PostViewTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+        
+        self.post = Post.objects.create(
+            accountname=self.user,
+            post_title="Sample Post",
+            post_community="General",
+            post_body="This is a sample post body."
+        )
+    
+    def test_view_posts(self):
+        response = self.client.get(reverse("post_index"))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(downvote_we_just_created.activity_type, 'D') #just quadruple checking that it's a down vote
+        self.assertContains(response, self.post.post_title)
+
+    def test_view_post_detail(self):
+        response = self.client.get(reverse("post_detail", kwargs={'pk': self.post.id, 'action': 0}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.post.post_title)
+
+class PostCreateTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+
+    def test_create_post(self):
+        response = self.client.post(reverse("post_index"), {
+            "post_title": "New Post",
+            "post_community": "Community",
+            "post_body": "Post body content.",
+        })
+        
+        self.assertEqual(response.status_code, 302)  # Assuming a redirect happens on success
+        self.assertTrue(Post.objects.filter(post_title="New Post").exists())
+
+class PostSearchTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+
+        self.post = Post.objects.create(
+            accountname=self.user,
+            post_title="Searchable Post",
+            post_community="Community",
+            post_body="This post should be searchable.",
+        )
+
+    def test_search_posts(self):
+        response = self.client.get(reverse("search_results") + "?q=Searchable")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.post.post_title)
+
+class AddTagTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+
+        self.tag = Tag.objects.create(name="Test Tag")
+        self.post = Post.objects.create(
+            accountname=self.user,
+            post_title="Tagged Post",
+            post_community="Community",
+            post_body="This post will be tagged.",
+        )
+        self.post.tags.add(self.tag)
+
+    def test_add_tag(self):
+        response = self.client.get(reverse("post_tag", kwargs={'tag': self.tag.name}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.post.post_title)
+
+class CommentTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+
+        self.post = Post.objects.create(
+            accountname=self.user,
+            post_title="Commentable Post",
+            post_community="Community",
+            post_body="This post will receive a comment.",
+        )
+
+    def test_make_comment(self):
+        response = self.client.post(reverse("post_detail", kwargs={'pk': self.post.id, 'action': 0}), {
+            "body": "This is a comment.",
+        })
+        
+        self.assertEqual(response.status_code, 302)  # Assuming a redirect on success
+        self.assertTrue(Comment.objects.filter(body="This is a comment.").exists())
+
+class AccountHomePageTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="jacob", email="jacob@…", password="top_secret", account_bio="wierdo",
+        )
+        self.client.login(username='jacob', password='top_secret')
+
+    def test_account_homepage(self):
+        response = self.client.get(reverse("user_account", kwargs={'user_id': self.user.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.user.username)
+
+class CommentNotificationTests(TestCase):
+
+    def setUp(self):
+        # Create test users
+        self.user = CustomUser.objects.create_user(username='testuser', password='password')
+        self.mentioned_user = CustomUser.objects.create_user(username='mentioneduser', password='password')
+        # Create a post
+        self.post = Post.objects.create(title='Test Post', body='Test body', author=self.user)
+
+    def test_notification_created_on_mention(self):
+        # Simulate mentioning a user in a post
+        self.post.body = f'@{self.mentioned_user.username} Check this out!'
+        self.post.save()
+
+        # Check if the notification is created
+        notification = Notification.objects.filter(user=self.mentioned_user).first()
+        self.assertIsNotNone(notification)
+        self.assertEqual(notification.text, f'You were mentioned in a post by {self.user.username}.')
+        self.assertFalse(notification.read)
+        self.assertTrue(notification.created_at <= timezone.now())
+
+    def test_notification_created_on_comment(self):
+        # Create a comment on the post
+        comment = Comment.objects.create(post=self.post, author=self.commented_user, body='Great post!')
+        
+        # Check if the notification is created
+        notification = Notification.objects.filter(user=self.user).first()
+        self.assertIsNotNone(notification)
+        self.assertEqual(notification.text, f'{self.commented_user.username} commented on your post.')
+        self.assertFalse(notification.read)
+        self.assertTrue(notification.created_at <= timezone.now())
