@@ -1,11 +1,23 @@
 {% extends "base.html" %}
+
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Discount Offers</title>
-</head>
-<body>
+
+    <style>
+
+        .discount-container {
+            background-color: RoyalBlue;
+            padding: 10px;
+            margin: 10px 0;
+            color: white;
+            text-align: center;
+        }
+    
+    </style>
+
+    <head>
+        <title>Discount Offers</title>
+    </head>
+
     <h1>Current Special Offers</h1>
 
     <a href="{% url 'home' %}">
@@ -27,20 +39,14 @@
 
     <h3>Current Offers:</h3>
     {% for offer in offers %}
-        <p>
-            On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
-        </p>
-        <p>
-            {{ offer.body | linebreaks }}
-        </p>
+        <div class="discount-container">
+            <p>
+                On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
+            </p>
+            <p>
+                {{ offer.body | linebreaks }}
+            </p>
+        </div>
     {% endfor %}
 
-
-
-    
-
-    
-    
-</body>
-</html>
 {% endblock %}
