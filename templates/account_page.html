@@ -77,6 +77,12 @@
     {% else %}
         <p>This user is a superuser and cannot be reported.</p>
     {% endif %}
+
+    {% if 'business' %}
+    <p> This user has linked a registered business to their account </p>
+    {% endif %}
+    
+    
     
 </body>
 </html>

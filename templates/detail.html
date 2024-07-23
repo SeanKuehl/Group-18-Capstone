@@ -4,37 +4,46 @@
 
 {% block content %}
 
+<a href="{% url 'home' %}">
+    <button>Back to Home</button>
+</a>
+
 {% block page_title %}
     <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
-{% block page_content %}
-    <a href="{% url 'home' %}">
-        <button>Back to Home</button>
-    </a>
 
-    <small>
+
+{% block page_content %}
+    
+
+    <h4>
         {{ post.created_on.date }} | 
         {% if post.accountname %}
-            <a href="{% url 'user_account' post.accountname.pk %}">
+            <a href="{% url 'user_account' post.accountname.pk %}" style="text-decoration: none;color: white;">
                 {{ post.accountname.username }}
             </a>
         {% else %}
             <!-- Link to superuser account page -->
-            <a href="{% url 'user_account' '0' %}">Superuser</a>
+            <a href="{% url 'user_account' '0' %}" style="text-decoration: none;color: white;">Superuser</a>
         {% endif %}
+
+        {% if post.tags.all %}
+
         | Tags:
+
+        {% endif %}
         <small id="DataAndTags">
-            {{ post.created_on.date }} | Tags:
+            {{ post.created_on.date }} {% if post.tags.all %}| Tags: {% endif %}
             {% for tag in post.tags.all %}
                 <a href="{% url 'post_tag' tag.name %}">
                     {{ tag.name }}
                 </a>
             {% endfor %}
         </small>
-    </small>
-    <p>This post has: {{upvotes}} upvotes</p>
-    <p>This post has: {{downvotes}} downvotes</p>
+    </h4>
+    <h4>This post has {{upvotes}} upvotes and {{downvotes}} downvotes</h4>
+    
 
     <a href="{% url 'post_detail' pk=post.id action=1 %}">
         <button>Up Vote</button>
@@ -68,6 +77,9 @@
     </form>
 
     <h3>Comments:</h3>
+
+    {% if comments %}
+
     {% for comment in comments %}
         <p>
             On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
@@ -76,6 +88,13 @@
             {{ comment.body | linebreaks }}
         </p>
     {% endfor %}
+
+    {% else %}
+
+    <h4> No one's commented yet. You can be the first! </h4>
+
+    {% endif %}
+
 {% endblock page_content %}
 
 {% endblock %}

@@ -3,14 +3,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <a href="{% url 'home' %}">
+        <button>Back to Home</button>
+        </a>
     <title>Discount Offers</title>
 </head>
 <body>
     <h1>Current Special Offers</h1>
 
-    <a href="{% url 'home' %}">
-    <button>Back to Home</button>
-    </a>
+    <div align="center">
+        <h4> This is where businesses and organizations post special offers and discounts for Sonar users. You must have a registered business associated with your account to post here, but anyone can use the offers posted. New offers are always on the way, so make sure to check back often!</h4>
+    </div>
+
+    
     {% if is_business %}
 
     <h3>Create an offer:</h3>
@@ -26,6 +31,9 @@
     {% endif %}
 
     <h3>Current Offers:</h3>
+
+    {% if offers %}
+
     {% for offer in offers %}
         <p>
             On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
@@ -34,6 +42,12 @@
             {{ offer.body | linebreaks }}
         </p>
     {% endfor %}
+
+    {% else %}
+
+    <h4>There aren't any offers yet. Don't worry, good things are worth the wait.</h4>
+
+    {% endif %}
 
 
 

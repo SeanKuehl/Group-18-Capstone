@@ -331,16 +331,18 @@ def post_detail(request, pk, action):
 
 def user_account(request, user_id):
 
+    existing_business = RegisteredBusiness.objects.filter(associated_user=request.user)
+
     if user_id == 0:
         # For the placeholder superuser ID, display all posts
         posts = Post.objects.all()
-        return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
+        return render(request, 'account_page.html', {'account': request.user, 'posts': posts, 'business': existing_business})
     else:
         # For regular users, retrieve their account and associated posts
         account = CustomUser.objects.get(pk=user_id)
     
         if request.user.is_superuser:
-            return render(request, 'account_page.html', {'account': request.user, 'posts': posts})
+            return render(request, 'account_page.html', {'account': request.user, 'posts': posts, 'business': existing_business})
         else:
             #this is where most regular users will go 
             
@@ -375,7 +377,8 @@ def user_account(request, user_id):
                 'posts': posts, 
                 'Profileform': Profileform, 
                 'Reviewform': Reviewform,
-                'reviews': reviews_on_this_user
+                'reviews': reviews_on_this_user,
+                'business': existing_business
                 }) 
 
 
@@ -727,16 +730,18 @@ def match_detail(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     return render(request, 'leagues/match_detail.html', {'match': match})
 
-
+@login_required
 def notifications_list(request):
     notifications = Notification.objects.all()
     return render(request, 'notifications_list.html', {'notifications': notifications})
 
+@login_required
 def clear_all_notifications(request):
     if request.method == 'POST':
         Notification.objects.all().delete()
     return redirect('notifications_list')
 
+@login_required
 def clear_notification(request, notification_id):
     if request.method == 'POST':
         Notification.objects.filter(id=notification_id).delete()
@@ -745,7 +750,7 @@ def clear_notification(request, notification_id):
 
 
 
-
+@login_required
 def ViewEvents(request):
     event_list = EventPost.objects.all()
     if request.method == 'POST':
@@ -763,7 +768,7 @@ def ViewEvents(request):
     return render(request, 'view_event_posts.html', {'form': form, 'events': event_list})
 
 
-
+@login_required
 def EventDetail(request, event_id):
     this_event = EventPost.objects.get(pk=event_id)
     num_of_people = len(EventAttendance.objects.filter(event=this_event))
@@ -794,6 +799,8 @@ def attend_event(request, event_id):
     if not EventAttendance.objects.filter(attendant=request.user, event=event).exists():
         EventAttendance.objects.create(attendant=request.user, event=event)
     return redirect('event-detail', event_id=event.id)
+
+
 
 def profile_pic(request, user_id):
 
