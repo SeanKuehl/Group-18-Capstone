@@ -8,6 +8,18 @@
     <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
+<style>
+    
+    .comment-container {
+        background-color: RoyalBlue;
+        padding: 10px;
+        margin: 10px 0;
+        color: white;
+        border-radius: 15px;
+    }
+
+</style>
+
 {% block page_content %}
     <a href="{% url 'home' %}">
         <button type="button" class="btn btn-dark">Back to Home</button>
@@ -67,15 +79,17 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <h3>Comments:</h3>
-    {% for comment in comments %}
+<h3>Comments:</h3>
+{% for comment in comments %}
+    <div class="comment-container">
         <p>
             On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
         </p>
         <p>
             {{ comment.body | linebreaks }}
         </p>
-    {% endfor %}
+    </div>
+{% endfor %}
 {% endblock page_content %}
 
 {% endblock %}
