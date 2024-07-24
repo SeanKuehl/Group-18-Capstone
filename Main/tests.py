@@ -1030,6 +1030,15 @@ class UpdateTeamMatchTestCase(TestCase):
         self.team1 = Team.objects.create(league=self.league, name='Team 1')
         self.team2 = Team.objects.create(league=self.league, name='Team 2')
 
+        self.match = Match.objects.create(
+            league=self.league,
+            date='2024-01-01 12:00:00',
+            team1=self.team1,
+            team2=self.team2,
+            team1_score=2,
+            team2_score=1
+        )
+
     def test_update_match(self):
 
         self.client.login(username='TestUser', password='top_secret')
