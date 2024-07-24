@@ -13,15 +13,54 @@
 
 {% else %}
 
-<p>You are not logged in</p>
-<form action="{% url 'login' %}" method="get">
-  <button type="submit" class="btn btn-dark">Log In</button>
-</form>
 
-<p> Don't have an account?</p>
-<form action="{% url 'sign_up' %}" method="get">
-  <button type="submit" class="btn btn-secondary">Sign Up</button>
-</form>
+
+
+
+
+<div align="center">
+  <div>
+    <h1 style="font-size:100px;"> Sonar </h1>
+  </div>
+
+  <div style="display: flex; justify-content: center;">
+    <a href="{% url 'login' %}">
+      <button type="submit" class="btn btn-dark">Log In</button>
+    </a>
+    
+    
+    
+    
+    <a href="{% url 'sign_up' %}">
+      <button type="submit" class="btn btn-secondary">Sign Up</button>
+    </a>
+    </div>
+
+  <div style="margin-top: 50px;">
+    <h3 style="margin-bottom: 50px;"> Hello, and welcome to Sonar. Sonar is an online event-hosting and networking platform to help you find, connect and have fun with those with similar interests.
+      Have you ever wanted to connect with someone who plays the same games as you or has read the same books? Well you've come to the right place!
+    </h3>
+
+    <h3 style="margin-bottom: 50px;">
+      In our ever connected world we find ourselves ever more apart. We send messages to friends everday, but when was the last time you had a meet up friends or made new ones?
+      With Sonar, you can find new friends to build a Minecraft castle with, talk about your favorite book or even play a casual baseball game with. The possbilities are endless!
+    </h3>
+
+    <h3 style="margin-bottom: 50px;">
+      Sonar has a suite of features like Leagues for sports and game tournaments, Steam integration to help verify and connect with others, event hosting facilities, special discount offers
+      and so much more! There's nothing to lose but your boredom, sign up today!
+    </h3>
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
 
 {% endif %}
 {% endblock %}

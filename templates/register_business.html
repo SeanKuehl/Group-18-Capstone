@@ -12,8 +12,12 @@
 
     <h1>Register Business</h1>
 
-    <p> Please enter a valid Canadian Business Number below to claim the business</p>
-    
+    <h4> If you are the owner or chosen representative of a registered Canadian business you can associate it with your account by entering the corporation's valid business number below.
+        The Sonar team will review your application with assistance from the Government of Canada's Federal Corporation API from the ISED API Catalogue. Once this process has been completed
+        successfully, you will be able to post discounts and special offers on behalf of your business to the Sonar community. The fact that you have a business associated with your account
+        will also be public to other Sonar users when viewing your account. Thank you for choosing the Sonar platform for your business needs.
+    </h4>
+    <div align="center" style="margin-top: 50px;">
     <form method="post">
         {% csrf_token %}
         <input type="text" name="business_number">
@@ -24,6 +28,7 @@
     {% if error %}
         <p> Sorry, we couldn't find that business or it's already registered. Please try again. </p>
     {% endif %}
+    </div>
 </body>
 </html>
 {% endblock %}
