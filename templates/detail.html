@@ -8,15 +8,27 @@
     <h2 id="PostTitle">{{ post.post_title }}</h2>
 {% endblock page_title %}
 
+<style>
+    
+    .comment-container {
+        background-color: RoyalBlue;
+        padding: 10px;
+        margin: 10px 0;
+        color: white;
+        border-radius: 15px;
+    }
+
+</style>
+
 {% block page_content %}
     <a href="{% url 'home' %}">
-        <button>Back to Home</button>
+        <button type="button" class="btn btn-dark">Back to Home</button>
     </a>
 
     <small>
         {{ post.created_on.date }} | 
         {% if post.accountname %}
-            <a href="{% url 'user_account' post.accountname.pk %}">
+            <a href="{% url 'user_account' post.accountname.pk %}" style="text-decoration: none; color: white;">
                 {{ post.accountname.username }}
             </a>
         {% else %}
@@ -37,21 +49,21 @@
     <p>This post has: {{downvotes}} downvotes</p>
 
     <a href="{% url 'post_detail' pk=post.id action=1 %}">
-        <button>Up Vote</button>
+        <button type="button" class="btn btn-success">Up Vote</button>
     </a>
 
     <a href="{% url 'post_detail' pk=post.id action=2 %}">
-        <button>Down Vote</button>
+        <button type="button" class="btn btn-danger">Down Vote</button>
     </a>
 
     <p id="PostBody">{{ post.post_body}}</p>
-    <button onclick="CopyText()">Copy Text</button>
+    <button type="button" class="btn btn-secondary" onclick="CopyText()">Copy Text</button>
 
     <!-- Button to copy post URL -->
-    <button id="copyLinkBtn">Copy Post Link</button>
+    <button type="button" class="btn btn-secondary" id="copyLinkBtn">Copy Post Link</button>
 
     <a href="{% url 'report_post' post.id %}">
-        <button>Report Post</button>
+        <button type="button" class="btn btn-danger">Report Post</button>
     </a>
     <p>This post has been reported {{ post.reported_count }} times.</p>
 
@@ -67,15 +79,17 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <h3>Comments:</h3>
-    {% for comment in comments %}
+<h3>Comments:</h3>
+{% for comment in comments %}
+    <div class="comment-container">
         <p>
             On {{ comment.created_on.date }} <b>{{ comment.author }}</b> wrote:
         </p>
         <p>
             {{ comment.body | linebreaks }}
         </p>
-    {% endfor %}
+    </div>
+{% endfor %}
 {% endblock page_content %}
 
 {% endblock %}

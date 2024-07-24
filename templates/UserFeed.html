@@ -3,8 +3,31 @@
 {% block title %} {% endblock %}
 
 {% block content %}
+
+<style>
+  .post-container {
+      background-color: RoyalBlue;
+      padding: 10px;
+      margin: 10px 0;
+      color: white;
+      text-align: center;
+  }
+
+  /* removes the hyperlink styling (i.e., the underline and blue text) */
+  .post-container h3 a {
+      color: white;
+      text-decoration: none;
+  }
+
+  .post-container a {
+      color: white;
+      text-decoration: none;
+  }
+
+</style>
+
 {% for post in posts %}
-  <div style="text-align: left;">
+  <div class="post-container">
     <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
     <small>
         {{ post.created_on.date }} | 

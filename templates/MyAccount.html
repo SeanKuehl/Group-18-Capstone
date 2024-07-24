@@ -1,19 +1,54 @@
 {% extends "base.html" %}
+
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</title>
-</head>
-<body>
+
+    <h1><title>{% if account_name %}{{ account_name }}{% else %}{{ account.account_name }}{% endif %}'s Account</title></h1>
+    <h2>Edit Account</h2>
     
     <form method="post">  
-        {% csrf_token %}  
-        {{ form.as_p }}  
-        <input type="submit" value="Save">  
-    </form>  
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="id_email" class="form-label"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-title="Enter your email address.">
+            Email address:
+          </label>
+          <input type="email" name="email" maxlength="254" id="id_email" class="form-control">
+        </div>
 
-    
-</body>
-</html>
+        <div class="mb-3">
+          <label for="id_username" class="form-label"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-title="Choose a unique username. 150 characters or fewer. Letters, digits and @/./+/-/_ only.">
+            Username:
+          </label>
+          <input type="text" name="username" value="dpham" maxlength="150" required id="id_username" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label for="id_account_bio" class="form-label"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-title="Write a brief bio about yourself.">
+            Account bio:
+          </label>
+          <textarea name="account_bio" cols="40" rows="10" required id="id_account_bio" class="form-control">hello world</textarea>
+        </div>
+
+        <input type="submit" value="Save" class="btn btn-primary">
+      </form>  
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
 {% endblock %}

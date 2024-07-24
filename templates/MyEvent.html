@@ -1,19 +1,68 @@
 {% extends "base.html" %}
-{% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Event</title>
-</head>
-<body>
-    
-    <form method="post">  
-        {% csrf_token %}  
-        {{ form.as_p }}  
-        <input type="submit" value="Save">  
-    </form>  
 
-    
-</body>
-</html>
+{% block title %}My Event{% endblock %}
+
+{% block content %}
+    <h2>Editing Event</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="{{ form.post_title.id_for_label }}" class="form-label"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-title="Enter the title of the event">
+                {{ form.post_title.label }}
+            </label>
+            {{ form.post_title }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.post_location.id_for_label }}" class="form-label"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-title="Specify the location of the event">
+                {{ form.post_location.label }}
+            </label>
+            {{ form.post_location }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.post_date_and_time.id_for_label }}" class="form-label"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-title="Indicate the date and time of the event">
+                {{ form.post_date_and_time.label }}
+            </label>
+            {{ form.post_date_and_time }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.post_body.id_for_label }}" class="form-label"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-title="Provide details about the event">
+                {{ form.post_body.label }}
+            </label>
+            {{ form.post_body }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.event_status.id_for_label }}" class="form-label"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-title="Select the current status of the event">
+                {{ form.event_status.label }}
+            </label>
+            {{ form.event_status }}
+        </div>
+
+        <input type="submit" value="Save" class="btn btn-primary">
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 {% endblock %}
