@@ -60,6 +60,7 @@ urlpatterns = [
     path('view-discounts/', view_discounts_page, name='discounts'),
 
     path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/', include('notifications.urls', namespace='notifications')),
     path('notifications/clear_all/', views.clear_all_notifications, name='clear_all_notifications'),
     path('notifications/<int:notification_id>/clear/', views.clear_notification, name='clear_notification'),
 
