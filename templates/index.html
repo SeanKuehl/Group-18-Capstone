@@ -6,8 +6,28 @@
     <h2>Posts</h2>
 {% endblock page_title %}
 
+<style>
+    .post-container {
+        background-color: RoyalBlue;
+        border-color: white;
+        border-width: thin;
+        border-style: double;
+        padding: 10px;
+        margin: 10px 0;
+        color: white;
+        text-align: center;
+    }
+
+    /* removes the hyperlink styling (ie the underline and blue text) */
+    .post-container h3 a {
+        color: white;
+        text-decoration: none;
+    }
+
+</style>
+
 <a href="{% url 'home' %}">
-    <button>Back to Home</button>
+    <button type="button" class="btn btn-dark">Back to Home</button>
 </a>
 
 <form action="{% url 'search_results'%}" method="get">
@@ -39,8 +59,9 @@
             </form>
         </div>
         {% for post in posts %}
-        <div align="center" style="background-color: RoyalBlue; border-color: white; border-width: thin; border-style: double;">
-            <h3><a href="{% url 'post_detail' post.pk 0 %}" style="text-decoration: none;color: white;">{{ post.post_title }}</a></h3>
+
+        <div align="center"  class="post-container">
+            <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
             <h4>
                 {{ post.created_on.date }} | 
                 {% if post.accountname %}
@@ -48,7 +69,7 @@
                         {{ post.accountname.username }}
                     </a>
                 {% else %}
-                    <p> test </p>
+                    <p> ERROR: No account found </p>
                 {% endif %}
                 
                 {% if tag %}
@@ -64,15 +85,12 @@
                 </h4>
             <p>{{ post.post_body | slice:":400" }}...</p>
         </div>
+
         {% endfor %}
     {% endblock posts %}
 {% endblock page_content %}
 
-
-
-
 <script>
-    
     document.addEventListener('DOMContentLoaded', function() {
         var tagInput = document.getElementById('tagInput');
         var postForm = document.getElementById('postForm');

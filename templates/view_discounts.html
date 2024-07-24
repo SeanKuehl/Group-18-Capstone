@@ -1,10 +1,25 @@
 {% extends "base.html" %}
+
 {% block content %}
+
 <!DOCTYPE html>
 <html>
+  
+<style>
+
+      .discount-container {
+          background-color: RoyalBlue;
+          padding: 10px;
+          margin: 10px 0;
+          color: white;
+          text-align: center;
+      }
+    
+</style>
+  
 <head>
     <a href="{% url 'home' %}">
-        <button>Back to Home</button>
+        <button type="button" class="btn btn-dark">Back to Home</button>
         </a>
     <title>Discount Offers</title>
 </head>
@@ -16,6 +31,7 @@
     </div>
 
     
+
     {% if is_business %}
 
     <h3>Create an offer:</h3>
@@ -35,12 +51,14 @@
     {% if offers %}
 
     {% for offer in offers %}
-        <p>
-            On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
-        </p>
-        <p>
-            {{ offer.body | linebreaks }}
-        </p>
+        <div class="discount-container">
+            <p>
+                On {{ offer.created_on.date }} <b>{{ offer.author }}</b>
+            </p>
+            <p>
+                {{ offer.body | linebreaks }}
+            </p>
+        </div>
     {% endfor %}
 
     {% else %}
@@ -57,4 +75,5 @@
     
 </body>
 </html>
+
 {% endblock %}

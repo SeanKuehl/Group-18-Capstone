@@ -10,7 +10,7 @@
     <h1>{{ account.username }}'s Account</h1>
   
     <a href="{% url 'home' %}">
-        <button>Back to Home</button>
+        <button type="button" class="btn btn-dark">Back to Home</button>
     </a>
 
     {% if user.profile_picture %}

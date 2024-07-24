@@ -4,14 +4,40 @@
 
 {% block content %}
 
+
 <div align="center">
 <h2>Welcome to your feed! Here are some posts we thought you might like.</h2>
 </div>
 
+
+
+<style>
+  .post-container {
+      background-color: RoyalBlue;
+      padding: 10px;
+      margin: 10px 0;
+      color: white;
+      text-align: center;
+  }
+
+  /* removes the hyperlink styling (i.e., the underline and blue text) */
+  .post-container h3 a {
+      color: white;
+      text-decoration: none;
+  }
+
+  .post-container a {
+      color: white;
+      text-decoration: none;
+  }
+
+</style>
+
 {% for post in posts %}
-  <div style="text-align: center; margin-top: 100px;background-color: RoyalBlue; border-color: white; border-width: thin; border-style: double;">
-    <h3><a href="{% url 'post_detail' post.pk 0 %}" style="text-decoration: none;color: white;">{{ post.post_title }}</a></h3>
+  <div class="post-container">
+    <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
     <h4>
+
         {{ post.created_on.date }} | 
         {% if post.accountname %}
             <a href="{% url 'user_account' post.accountname.pk %}" style="text-decoration: none;color: white;">
