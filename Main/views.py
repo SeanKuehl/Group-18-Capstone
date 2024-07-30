@@ -141,12 +141,19 @@ def post_index(request):
             tags_input = request.POST.get('tags')
             if tags_input:
                 tags_list = tags_input.split(',')
+                tag_objects = []
                 for tag_name in tags_list:
                     tag_name = tag_name.strip()
                     if contains_hate_speech(tag_name) or contains_curse_words(tag_name):
                         return HttpResponse("One or more tags contain inappropriate content. Please review and try again.")
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    tag_objects.append(tag)
+                post.save()  # Save the post first
+                post.tags.set(tag_objects)  # Then set the tags
 
-            post.save()
+            else:
+                post.save()
+            print(post.tags.all())
 
             # Extract usernames mentioned in the post content
             mentioned_usernames = [word[1:] for word in post.post_body.split() if word.startswith('@')]
@@ -204,9 +211,11 @@ def remove_account(request, pk):
 
 
 def post_tag(request, tag):
+
     posts = Post.objects.filter(
         tags__name__contains=tag
     ).order_by("-created_on")
+    
     context = {
         "tag": tag,
         "posts": posts,
