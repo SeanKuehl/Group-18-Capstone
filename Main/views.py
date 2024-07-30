@@ -94,18 +94,19 @@ def HomePage(request):
 class SearchResultsView(ListView):
     model = Post
     template_name = 'search_results.html'
-
     
-
     def get_queryset(self):
-        query = self.request.GET.get("q")
+        query = self.request.GET.get("q", "")
         
-
-        if query != None:
-            object_list = []
+        if query:
+            # Filter posts based on the search query
+            object_list = Post.objects.filter(
+                Q(post_title__icontains=query) |
+                Q(post_body__icontains=query)
+            ).distinct()
         else:
             object_list = Post.objects.all()
-
+        
         return object_list
 
 def search_game_on_steam(request, game_name):

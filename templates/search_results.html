@@ -6,18 +6,23 @@
     <button type="button" class="btn btn-dark">Back to Home</button>
 </a>
 
-
+{% if object_list %}
     {% for post in object_list %}
-    <div align="center" style="background-color: RoyalBlue; border-color: white; border-width: thin; border-style: double;">
-        
-    
-    <h4>
-        <a href="{% url 'post_detail' post.pk 0 %}" style="text-decoration: none;color: white;">{{ post.post_title }}</a> |
-        {{ post.created_on.date }} | <a href="{% url 'user_account' post.accountname.pk %}" style="text-decoration: none;color: white;"></a>
-        
-    </h4>
-    <p>{{ post.post_body | slice:":400" }}...</p>
-    </div>
+        <div align="center" style="background-color: RoyalBlue; border-color: white; border-width: thin; border-style: double;">
+            <h4>
+                <a href="{% url 'post_detail' post.pk 0 %}" style="text-decoration: none;color: white;">{{ post.post_title }}</a> |
+                {{ post.created_on.date }} | 
+                {% if post.accountname %}
+                    <a href="{% url 'user_account' post.accountname.pk %}" style="text-decoration: none;color: white;">{{ post.accountname.username }}</a>
+                {% else %}
+                    <span>No user associated</span>
+                {% endif %}
+            </h4>
+            <p>{{ post.post_body | slice:":400" }}...</p>
+        </div>
     {% endfor %}
+{% else %}
+    <p>No results found.</p>
+{% endif %}
 
 {% endblock %}
