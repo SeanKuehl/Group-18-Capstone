@@ -20,7 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 from allauth.socialaccount.providers.oauth2.urls import default_urlpatterns
-from Providers.Steam.provider import SteamProvider
+from allauth.socialaccount.providers.steam.urls import urlpatterns as steam_urlpatterns
+from Providers.Steam.provider import OpenIDProvider
 
 from .views import *
 
@@ -73,7 +74,7 @@ urlpatterns = [
     path('my_event/<int:pk>', MyEventUpdateView.as_view(), name='my_event'),
 ]
 
-urlpatterns += default_urlpatterns(SteamProvider)
+urlpatterns += steam_urlpatterns
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

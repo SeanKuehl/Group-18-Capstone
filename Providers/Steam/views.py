@@ -1,11 +1,31 @@
-from allauth.socialaccount.providers.oauth2.views import OAuth2LoginView, OAuth2CallbackView
+from django.urls import reverse
 
-class SteamOAuth2Adapter:
-    provider_id = 'steam'
-    authorize_url = "https://steamcommunity.com/openid/login"
-    access_token_url = "https://steamcommunity.com/openid/login"
-    profile_url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
+from allauth.socialaccount.providers.openid.views import (
+    OpenIDCallbackView,
+    OpenIDLoginView,
+)
+
+from .provider import SteamOpenIDProvider
 
 
-oauth2_login = OAuth2LoginView.adapter_view(SteamOAuth2Adapter)
-oauth2_callback = OAuth2CallbackView.adapter_view(SteamOAuth2Adapter)
+STEAM_OPENID_URL = "https://steamcommunity.com/openid"
+
+
+class SteamOpenIDLoginView(OpenIDLoginView):
+    provider_class = SteamOpenIDProvider
+
+    def get_form(self):
+        items = dict(list(self.request.GET.items()) + list(self.request.POST.items()))
+        items["openid"] = STEAM_OPENID_URL
+        return self.form_class(items)
+
+    def get_callback_url(self):
+        return reverse(steam_callback)
+
+
+class SteamOpenIDCallbackView(OpenIDCallbackView):
+    provider_class = SteamOpenIDProvider
+
+
+steam_login = SteamOpenIDLoginView.as_view()
+steam_callback = SteamOpenIDCallbackView.as_view()
