@@ -22,7 +22,7 @@ from allauth.socialaccount import providers
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-_ejytww^gq8jug$$ua(k%&p4e4sf6ot&x#(n2$!u--8yep0tt8'
-STEAM_API_KEY = '35DED161963F2D948761AC99A921E56D'
+STEAM_API_KEY = 'BCF63B4845C16515857538F79387D2B6'
 API_KEY = '9c24e27f6bf731f2d7c6b366cabdd296'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'Main',
     'Accounts',
     'bootstrap5',
@@ -47,7 +48,10 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.mfa',
     'allauth.socialaccount.providers.openid',
+    'allauth.socialaccount.providers.steam',
+    'allauth.headless',
 ]
 
 MIDDLEWARE = [
@@ -86,6 +90,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Testudo.wsgi.application'
 
+SITE_ID = 1 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -152,3 +157,18 @@ AUTH_USER_MODEL = "Accounts.CustomUser"
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+SOCIALACCOUNT_PROVIDERS = {
+    'steam': {
+        'APP': {
+            'client_id': '',  
+            'secret': '',    
+            'key': STEAM_API_KEY,
+        },
+        'SCOPE': [
+            'openid',
+            'user:email',
+        ],
+    }
+}
