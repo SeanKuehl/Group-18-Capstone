@@ -32,19 +32,6 @@
         </a>
     {% endif %}
 
-    <h2>Posts:</h2>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <strong>Title:</strong> {{ post.post_title }}<br>
-                <strong>Community:</strong> {{ post.post_community }}<br>
-                <strong>Body:</strong> {{ post.post_body }}<br>
-                <!-- Display other post information as needed -->
-            </li>
-        {% empty %}
-            <li>No posts found.</li>
-        {% endfor %}
-    </ul>
 
     <h3>Leave a review:</h3>
     <form method="post" id="UserReviewForm">
@@ -60,14 +47,18 @@
 
 
     <h3>Reviews:</h3>
+    <div align="center" style="overflow-y: scroll;">
     {% for rev in reviews %}
+    <div align="center" style="background-color: RoyalBlue;border-color: white;border-width: thin;border-style: double;color: white;text-align: center;">
         <p>
             On {{ rev.created_on.date }} <b>{{ rev.author }}</b> wrote:
         </p>
         <p>
             {{ rev.body | linebreaks }}
         </p>
+    </div>
     {% endfor %}
+    </div>
 
     {% if not user.is_superuser %}
         <a href="{% url 'report_user' account.pk %}">
@@ -78,9 +69,23 @@
         <p>This user is a superuser and cannot be reported.</p>
     {% endif %}
 
-    {% if 'business' %}
-    <p> This user has linked a registered business to their account </p>
-    {% endif %}
+    
+
+    <h2>Posts:</h2>
+    <ul>
+        {% for post in posts %}
+            <div align="center" style="overflow-y: scroll;background-color: RoyalBlue;border-color: white;border-width: thin;border-style: double;color: white;text-align: center;">
+                <strong>Title:</strong> {{ post.post_title }}<br>
+                <strong>Community:</strong> {{ post.post_community }}<br>
+                <strong>Body:</strong> {{ post.post_body }}<br>
+                <!-- Display other post information as needed -->
+            </div>
+        {% empty %}
+            <li>No posts found.</li>
+        {% endfor %}
+    </ul>
+
+    
     
     
     

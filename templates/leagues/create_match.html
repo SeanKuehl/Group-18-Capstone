@@ -16,7 +16,7 @@
             {% endfor %}
         </div>
 
-        {% if league.is_team_league %}
+        {% if league.team_league %}
         <div class="mb-3">
             <label for="{{ form.team1.id_for_label }}" class="form-label">Team 1</label>
             {{ form.team1 }}

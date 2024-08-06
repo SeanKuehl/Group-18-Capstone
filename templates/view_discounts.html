@@ -13,6 +13,7 @@
           margin: 10px 0;
           color: white;
           text-align: center;
+          
       }
     
 </style>
@@ -49,7 +50,7 @@
     <h3>Current Offers:</h3>
 
     {% if offers %}
-
+    <div align="center" style="overflow-y: scroll;">
     {% for offer in offers %}
         <div class="discount-container">
             <p>
@@ -60,6 +61,7 @@
             </p>
         </div>
     {% endfor %}
+    </div>
 
     {% else %}
 

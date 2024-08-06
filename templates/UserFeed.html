@@ -18,6 +18,8 @@
       margin: 10px 0;
       color: white;
       text-align: center;
+      overflow-y: scroll;
+      
   }
 
   /* removes the hyperlink styling (i.e., the underline and blue text) */
@@ -33,6 +35,10 @@
 
 </style>
 
+{% if not posts %}
+<h4 align="center"> Sorry, there isn't anything here right now. Check back soon!</h4>
+{% endif %}
+<div align="center" style="overflow-y: scroll;">
 {% for post in posts %}
   <div class="post-container">
     <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
@@ -73,4 +79,5 @@
 
 
 {% endfor %}
+</div>
 {% endblock %}

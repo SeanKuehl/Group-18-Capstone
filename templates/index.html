@@ -16,6 +16,7 @@
         margin: 10px 0;
         color: white;
         text-align: center;
+        
     }
 
     /* removes the hyperlink styling (ie the underline and blue text) */
@@ -58,7 +59,9 @@
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
+        <div align="center" style="overflow-y: scroll;">
         {% for post in posts %}
+        
 
         <div align="center"  class="post-container">
             <h3><a href="{% url 'post_detail' post.pk 0 %}">{{ post.post_title }}</a></h3>
@@ -72,13 +75,13 @@
                     <p> ERROR: No account found </p>
                 {% endif %}
                 
-                {% if tag %}
+                {% if post.tags.all %}
                 | Tags:
                 {% endif %}
 
                 {% for tag in post.tags.all %}
 
-                    <a href="{% url 'post_tag' tag.name %}">
+                    <a href="{% url 'post_tag' tag.name %}" style="text-decoration: none;color:white;">
                         {{ tag.name }}
                     </a>
                 {% endfor %}
@@ -87,6 +90,7 @@
         </div>
 
         {% endfor %}
+    </div>
     {% endblock posts %}
 {% endblock page_content %}
 

@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 
 
 from Main.models import *
-from Main.models import RegisteredBusiness, DiscountOffer
+from Main.models import RegisteredBusiness, DiscountOffer, UserReview
 from Main.forms import *
 
 from Main.steam import get_game_details
@@ -373,7 +373,7 @@ def user_account(request, user_id):
                 elif 'submit_review' in request.POST and Reviewform.is_valid():
                     review = Reviewform.save(commit=False)
                     review.author = request.user.username
-                    review.user_reviewed = request.user
+                    review.user_reviewed = account
                     review.save()
                     return HttpResponseRedirect(request.path_info)
                 else:
@@ -742,7 +742,7 @@ def match_detail(request, match_id):
 
 @login_required
 def notifications_list(request):
-    notifications = Notification.objects.all()
+    notifications = Notification.objects.filter(user=request.user)
     return render(request, 'notifications_list.html', {'notifications': notifications})
 
 @login_required

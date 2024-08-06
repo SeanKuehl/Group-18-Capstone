@@ -6,40 +6,40 @@
     <h2>Edit Account</h2>
     
     <form method="post">  
-        {% csrf_token %}
-        
-        <div class="mb-3">
-          <label for="id_email" class="form-label"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-title="Enter your email address.">
-            Email address:
-          </label>
-          <input type="email" name="email" maxlength="254" id="id_email" class="form-control">
-        </div>
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label for="id_email" class="form-label"
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          data-bs-title="Enter your email address.">
+          Email address:
+        </label>
+        <input type="email" name="email" value="{{ user.email }}" maxlength="254" id="id_email" class="form-control">
+      </div>
 
-        <div class="mb-3">
-          <label for="id_username" class="form-label"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-title="Choose a unique username. 150 characters or fewer. Letters, digits and @/./+/-/_ only.">
-            Username:
-          </label>
-          <input type="text" name="username" value="dpham" maxlength="150" required id="id_username" class="form-control">
-        </div>
+      <div class="mb-3">
+        <label for="id_username" class="form-label"
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          data-bs-title="Choose a unique username. 150 characters or fewer. Letters, digits and @/./+/-/_ only.">
+          Username:
+        </label>
+        <input type="text" name="username" value="{{ user.username }}"maxlength="150" required id="id_username" class="form-control">
+      </div>
 
-        <div class="mb-3">
-          <label for="id_account_bio" class="form-label"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-title="Write a brief bio about yourself.">
-            Account bio:
-          </label>
-          <textarea name="account_bio" cols="40" rows="10" required id="id_account_bio" class="form-control">hello world</textarea>
-        </div>
+      <div class="mb-3">
+        <label for="id_account_bio" class="form-label"
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          data-bs-title="Write a brief bio about yourself.">
+          Account bio:
+        </label>
+        <textarea name="account_bio" cols="40" rows="10" required id="id_account_bio" class="form-control">{{ user.account_bio }}</textarea>
+      </div>
 
-        <input type="submit" value="Save" class="btn btn-primary">
-      </form>  
+      <input type="submit" value="Save" class="btn btn-primary">
+    </form>  
     </div>
 
-    <div class="mt-4">
+    <div align="center" class="mt-4">
         <a href="{% url 'steam_login' %}" class="btn btn-primary">Log in with Steam</a>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

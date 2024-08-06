@@ -8,6 +8,7 @@
             margin: 10px 0;
             color: white;
             text-align: center;
+            
         }
 
         /* removes the hyperlink styling (i.e., the underline and blue text) */
@@ -38,7 +39,12 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
+    {% if events %}
     <h3>Current Events:</h3>
+    {% endif %}
+
+    <div align="center" style="overflow-y: scroll;">
+    
     {% for event in events %}
         <div class="post-container">
             <p>
@@ -52,4 +58,5 @@
             </p>
         </div>
     {% endfor %}
+    </div>
 {% endblock %}

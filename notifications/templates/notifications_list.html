@@ -9,6 +9,7 @@
     <button type="submit">Clear All Notifications</button>
   </form>
 
+  <div align="center" style="overflow-y: scroll;background-color: RoyalBlue;border-color: white;border-width: thin;border-style: double;color: white;text-align: center;">
   <ul>
     {% for notification in notifications %}
       <li>
@@ -23,4 +24,5 @@
       <li>No notifications</li>
     {% endfor %}
   </ul>
+  </div>
 {% endblock %}

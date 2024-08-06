@@ -124,7 +124,12 @@
                         {{ match.player1.username }} vs {{ match.player2.username }}
                     {% endif %}
                 </td>
-                <td>{{ match.player1_score }} - {{ match.player2_score }}</td>
+                <td>
+                    {% if league.team_league %}
+                        {{ match.team1_score }} vs {{ match.team2_score }}
+                    {% else %}
+                        {{ match.player1_score }} - {{ match.player2_score }}</td>
+                    {% endif %}
                 <td>{{ match.date }}</td>
                 <td>
                     <a href="{% url 'edit_match' match.id %}" class="btn btn-sm btn-secondary">Edit</a>
@@ -177,3 +182,4 @@
     });
 </script>
 {% endblock %}
+
