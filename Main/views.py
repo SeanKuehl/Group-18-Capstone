@@ -791,6 +791,7 @@ def EventDetail(request, event_id):
 
 @login_required
 def profile(request):
+    steam_account = None
     try:
         steam_account = SocialAccount.objects.get(user=request.user, provider='steam')
         steam_id = steam_account.extra_data['sub']
